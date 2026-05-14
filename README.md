@@ -3,6 +3,7 @@
 **GoNode** adalah *infrastructure-as-code orchestrator* berbasis Golang yang dirancang khusus untuk menjalankan aplikasi Node.js tanpa ketergantungan pada Nginx. Cukup satu binary untuk mengatur segalanya: mulai dari *reverse proxy*, manajemen proses, hingga optimasi sumber daya otomatis.
 
 ---
+## Flow Cara Kerja GoNode
 
 ## 🧐 Kenapa Harus Pakai GoNode?
 
