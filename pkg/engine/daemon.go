@@ -69,7 +69,7 @@ func RunDaemonLogic() {
 				res := fmt.Sprintf("App: %s | Profile: %s | Workers: %s | Uptime: %s\n", entry, name, workers, time.Since(startTime).Round(time.Second))
 				conn.Write([]byte(res))
 			case "stop":
-				conn.Write([]byte("🛑 Stopping GoNode Engine...\n"))
+				conn.Write([]byte("Stopping GoNode Engine...\n"))
 				nodeCmd.Process.Kill()
 				os.Remove(SOCKET_FILE)
 				os.Exit(0)

@@ -35,7 +35,7 @@ func SetupNginx(domain string, port string) error {
 		return fmt.Errorf("failed to write temporary file: %v", err)
 	}
 
-	fmt.Printf("\n🤖 AI Orchestrator: Starting Nginx configuration for %s\n", domain)
+	fmt.Printf("\nAI Orchestrator: Starting Nginx configuration for %s\n", domain)
 
 	// 2. Execute sudo command sequence automatically
 	steps := []struct {
@@ -53,11 +53,11 @@ func SetupNginx(domain string, port string) error {
 		cmd := exec.Command(step.Command[0], step.Command[1:]...)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			fmt.Printf("❌ Failed at stage: %s\nDetail: %s\n", step.Name, string(output))
+			fmt.Printf("Error: Failed at stage: %s\nDetail: %s\n", step.Name, string(output))
 			return err
 		}
 	}
 
-	fmt.Printf("✅ Nginx for %s is now active and running perfectly!\n", domain)
+	fmt.Printf("Success! Nginx for %s is now active and running perfectly!\n", domain)
 	return nil
 }

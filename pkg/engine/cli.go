@@ -44,9 +44,9 @@ func HandleStartCommand() {
 	
 	switch appType {
 	case "Smart Scan (AI Detect)":
-		fmt.Println("🤖 AI Orchestrator: Analyzing project structure...")
+		fmt.Println("AI Orchestrator: Analyzing project structure...")
 		entryPoint, startCmd = SmartDetect()
-		fmt.Printf("✅ AI Suggestion: Use %s mode with Entry Point: %s\n", startCmd, entryPoint)
+		fmt.Printf("Success! AI Suggestion: Use %s mode with Entry Point: %s\n", startCmd, entryPoint)
 	case "Backend (API/Node.js)":
 		entryPoint = FindBackendEntry()
 	default:
@@ -62,7 +62,7 @@ func HandleStartCommand() {
 	}, &confirm)
 
 	if !confirm {
-		fmt.Println("❌ Cancelled.")
+		fmt.Println("Cancelled.")
 		return
 	}
 
@@ -87,7 +87,7 @@ func HandleStartCommand() {
 			survey.AskOne(&survey.Input{Message: "Enter Domain (e.g., myapp.com):"}, &domainOrIP)
 		} else {
 			domainOrIP = getLocalIP()
-			fmt.Printf("🌐 AI Orchestrator: Detected Local IP: %s\n", domainOrIP)
+			fmt.Printf("AI Orchestrator: Detected Local IP: %s\n", domainOrIP)
 		}
 		
 		survey.AskOne(&survey.Input{Message: "Enter App Port (default 3000):", Default: "3000"}, &port)
@@ -129,17 +129,17 @@ func launchDaemon(config ServerProfile, entryPoint string, startCmd string) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true} 
 
 	if err := cmd.Start(); err != nil {
-		fmt.Printf("❌ Failed to detach process to background: %v\n", err)
+		fmt.Printf("Error: Failed to detach process to background: %v\n", err)
 		return
 	}
 
-	fmt.Printf("\n🚀 GoNode [%s] launched to background! Use 'gonode list' to monitor.\n", config.Name)
+	fmt.Printf("\nGoNode [%s] launched to background! Use 'gonode list' to monitor.\n", config.Name)
 }
 
 func SendCommand(cmd string) {
 	conn, err := net.Dial("unix", SOCKET_FILE)
 	if err != nil {
-		fmt.Println("❌ GoNode Daemon not found. Please run 'gonode start' first.")
+		fmt.Println("Error: GoNode Daemon not found. Please run 'gonode start' first.")
 		return
 	}
 	defer conn.Close()

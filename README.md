@@ -1,4 +1,4 @@
-# 🚀 GoNode - Adaptive Infrastructure Engine
+# GoNode - Adaptive Infrastructure Engine
 
 [![Go Version](https://img.shields.io/badge/Go-1.23-blue.svg)](https://golang.org)
 [![Node Version](https://img.shields.io/badge/Node-18+-green.svg)](https://nodejs.org)
@@ -8,23 +8,23 @@ GoNode is a high-performance orchestration engine that manages Node.js applicati
 
 ---
 
-## 📐 System Architecture
+## System Architecture
 
 ```mermaid
 graph TD
-    User((🌐 External Traffic)) -->|Port 80| Nginx[("🛡️ Nginx Gateway")]
+    User((External Traffic)) -->|Port 80| Nginx[("Nginx Gateway")]
     
     subgraph "GoNode Control Plane"
-    CLI[("💻 CLI User")] -->|1. Profiling| Engine
-    Engine[("🚀 GoNode Engine")] -->|2. Smart Scan| Detector{Frontend / Backend}
+    CLI[("CLI User")] -->|1. Profiling| Engine
+    Engine[("GoNode Engine")] -->|2. Smart Scan| Detector{Frontend / Backend}
     Engine -->|3. DNS Check| DNS[Propagation Verify]
     Engine -->|4. Automation| Nginx
-    Engine -->|5. Orchestrate| NodeApp["📦 Managed App"]
+    Engine -->|5. Orchestrate| NodeApp["Managed App"]
     end
 
     subgraph "Intelligent Infrastructure"
     Detector -->|Auto-Config| NodeApp
-    NodeApp -->|Output| Logger["📝 Timestamped Logger"]
+    NodeApp -->|Output| Logger["Timestamped Logger"]
     Logger -->|Rotation| LogFile["gonode.log (1MB Limit)"]
     end
 
@@ -33,7 +33,7 @@ graph TD
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 - **Nginx Automation**: Automatically generate and apply Nginx configs for **Public (Domain)** or **Local (IP)** access.
 - **DNS Propagation Check**: Integrated tool to verify if your domain points to your server before setup.
@@ -44,7 +44,7 @@ graph TD
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 GoNode/
@@ -62,7 +62,7 @@ GoNode/
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Environment Setup
 ```bash
@@ -94,4 +94,4 @@ gonode list
 
 ---
 
-Developed with ❤️ by **Rayhan Dita Adam**
+Developed with respect by **Rayhan Dita Adam**
