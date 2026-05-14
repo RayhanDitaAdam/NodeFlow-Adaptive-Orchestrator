@@ -66,10 +66,16 @@ GoNode/
 ./setup.sh
 ```
 
-### 2. Build & Launch
+### 2. Build & Global Setup
 ```bash
 ./install.sh
-./gonode start
+```
+> During installation, choose **'y'** when asked to make `gonode` global.
+
+### 3. Launch from Anywhere
+Now you can go to your project folder and run:
+```bash
+gonode start
 ```
 1. Select **RAM Profile**
 2. Select **App Type** (use Smart Scan)

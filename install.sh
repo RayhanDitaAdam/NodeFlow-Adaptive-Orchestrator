@@ -26,13 +26,22 @@ go build -o gonode cmd/gonode/main.go
 
 if [ $? -eq 0 ]; then
     chmod +x gonode
-    echo -e "${GREEN}✅ GoNode built successfully!${NC}"
-    echo -e "🚀 You can now use ${BLUE}./gonode${NC} to run the engine."
+    echo -e "${GREEN}✅ Build successful!${NC}"
     
-    # 3. Inform about PATH (Optional)
-    echo -e "\n${YELLOW}💡 Pro Tip:${NC}"
-    echo -e "To use 'gonode' from anywhere, you can run:"
-    echo -e "   ${BLUE}sudo mv gonode /usr/local/bin/${NC}"
+    # 4. Make it global (Optional)
+    echo -e "\n${YELLOW}🌍 Do you want to make 'gonode' command global? (y/n)${NC}"
+    read -r make_global
+    if [[ "$make_global" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+        echo -e "${YELLOW}🔑 Requesting sudo permission to create symlink...${NC}"
+        sudo ln -sf "$(pwd)/gonode" /usr/local/bin/gonode
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}🚀 Success! You can now run 'gonode' from any directory.${NC}"
+        else
+            echo -e "${RED}❌ Failed to create symlink.${NC}"
+        fi
+    fi
+    
+    echo -e "\n${GREEN}Usage: ./gonode start or simply 'gonode start' if global.${NC}"
 else
     echo -e "${RED}❌ Failed to build GoNode. Check main.go for errors.${NC}"
     exit 1
