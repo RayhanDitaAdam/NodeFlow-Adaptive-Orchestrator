@@ -81,7 +81,9 @@ gonode start
 1. Select **RAM Profile**
 2. Select **App Type** (use Smart Scan)
 3. Confirm Launch
-4. Select **Yes** for **Nginx Setup** and follow the prompts
+4. Select **Yes** for **Nginx Setup**
+5. Choose **Exposure Type**: **Public** (Domain) or **Local** (IP)
+6. Follow the prompts and monitor the automated setup
 
 ---
 

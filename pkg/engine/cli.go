@@ -74,17 +74,45 @@ func HandleStartCommand() {
 	}, &setupNginxPrompt)
 
 	if setupNginxPrompt {
-		domain := ""
+		exposureType := ""
+		survey.AskOne(&survey.Select{
+			Message: "Select Exposure Type:",
+			Options: []string{"Public (Domain Name)", "Local (IP Address)"},
+		}, &exposureType)
+
+		domainOrIP := ""
 		port := "3000"
-		survey.AskOne(&survey.Input{Message: "Enter Domain (e.g., myapp.com):"}, &domain)
+		
+		if exposureType == "Public (Domain Name)" {
+			survey.AskOne(&survey.Input{Message: "Enter Domain (e.g., myapp.com):"}, &domainOrIP)
+		} else {
+			domainOrIP = getLocalIP()
+			fmt.Printf("🌐 AI Orchestrator: Detected Local IP: %s\n", domainOrIP)
+		}
+		
 		survey.AskOne(&survey.Input{Message: "Enter App Port (default 3000):", Default: "3000"}, &port)
 		
-		if domain != "" {
-			SetupNginx(domain, port)
+		if domainOrIP != "" {
+			SetupNginx(domainOrIP, port)
 		}
 	}
 
 	launchDaemon(profiles[selectedProfile], entryPoint, startCmd)
+}
+
+func getLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return "127.0.0.1"
+	}
+	for _, address := range addrs {
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
+			}
+		}
+	}
+	return "localhost"
 }
 
 func launchDaemon(config ServerProfile, entryPoint string, startCmd string) {
