@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"os"
+	"os/exec"
 )
 
 // GenerateNginxConfig creates a string containing the Nginx reverse proxy setup
@@ -23,22 +24,36 @@ func GenerateNginxConfig(domain string, port string) string {
 	return fmt.Sprintf(template, domain, port)
 }
 
-// SetupNginx saves the config and attempts to enable it
+// SetupNginx saves the config and automatically applies it to the system
 func SetupNginx(domain string, port string) error {
 	config := GenerateNginxConfig(domain, port)
-	filename := fmt.Sprintf("%s.conf", domain)
+	tmpFile := fmt.Sprintf("/tmp/%s.conf", domain)
 	
-	// Write to a temporary local file first
-	err := os.WriteFile(filename, []byte(config), 0644)
+	// 1. Write to a temporary file
+	err := os.WriteFile(tmpFile, []byte(config), 0644)
 	if err != nil {
-		return err
+		return fmt.Errorf("gagal nulis file temp: %v", err)
 	}
 
-	fmt.Printf("\n✅ Nginx config berhasil dibuat: %s\n", filename)
-	fmt.Println("🚀 Untuk mengaktifkan, jalankan perintah ini:")
-	fmt.Printf("   1. sudo mv %s /etc/nginx/sites-available/\n", filename)
-	fmt.Printf("   2. sudo ln -s /etc/nginx/sites-available/%s /etc/nginx/sites-enabled/\n", filename)
-	fmt.Println("   3. sudo nginx -t && sudo systemctl reload nginx")
-	
+	fmt.Printf("\n⚙️  AI sedang mengonfigurasi Nginx untuk %s...\n", domain)
+
+	// 2. Jalankan rangkaian perintah sudo secara otomatis
+	commands := [][]string{
+		{"sudo", "mv", tmpFile, fmt.Sprintf("/etc/nginx/sites-available/%s", domain)},
+		{"sudo", "ln", "-sf", fmt.Sprintf("/etc/nginx/sites-available/%s", domain), fmt.Sprintf("/etc/nginx/sites-enabled/%s", domain)},
+		{"sudo", "nginx", "-t"},
+		{"sudo", "systemctl", "reload", "nginx"},
+	}
+
+	for i, cmdArgs := range commands {
+		cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			fmt.Printf("❌ Error di tahap %d: %s\n", i+1, string(output))
+			return err
+		}
+	}
+
+	fmt.Printf("✅ Nginx untuk %s berhasil diaktifkan secara otomatis!\n", domain)
 	return nil
 }

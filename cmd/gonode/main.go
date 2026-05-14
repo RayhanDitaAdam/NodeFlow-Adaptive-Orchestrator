@@ -8,8 +8,6 @@ import (
 )
 
 func main() {
-	// Auto-initialize installation if binary is missing
-	utils.InitInstallation()
 
 	if len(os.Args) < 2 {
 		utils.PrintHelp()
