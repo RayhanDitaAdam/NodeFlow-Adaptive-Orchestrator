@@ -105,7 +105,7 @@ func launchDaemon(config ServerProfile, entryPoint string, startCmd string) {
 		return
 	}
 
-	fmt.Printf("\n🚀 GoNode [%s] meluncur ke background! Manage pake './gonode list'.\n", config.Name)
+	fmt.Printf("\n🚀 GoNode [%s] meluncur ke background! Manage pake 'gonode list'.\n", config.Name)
 }
 
 func SendCommand(cmd string) {

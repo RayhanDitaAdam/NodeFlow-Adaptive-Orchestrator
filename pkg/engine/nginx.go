@@ -35,25 +35,29 @@ func SetupNginx(domain string, port string) error {
 		return fmt.Errorf("gagal nulis file temp: %v", err)
 	}
 
-	fmt.Printf("\n⚙️  AI sedang mengonfigurasi Nginx untuk %s...\n", domain)
+	fmt.Printf("\n🤖 AI Orchestrator: Memulai konfigurasi Nginx untuk %s\n", domain)
 
 	// 2. Jalankan rangkaian perintah sudo secara otomatis
-	commands := [][]string{
-		{"sudo", "mv", tmpFile, fmt.Sprintf("/etc/nginx/sites-available/%s", domain)},
-		{"sudo", "ln", "-sf", fmt.Sprintf("/etc/nginx/sites-available/%s", domain), fmt.Sprintf("/etc/nginx/sites-enabled/%s", domain)},
-		{"sudo", "nginx", "-t"},
-		{"sudo", "systemctl", "reload", "nginx"},
+	steps := []struct {
+		Name    string
+		Command []string
+	}{
+		{"Pindahkan config ke sites-available", []string{"sudo", "mv", tmpFile, fmt.Sprintf("/etc/nginx/sites-available/%s", domain)}},
+		{"Aktifkan symlink ke sites-enabled", []string{"sudo", "ln", "-sf", fmt.Sprintf("/etc/nginx/sites-available/%s", domain), fmt.Sprintf("/etc/nginx/sites-enabled/%s", domain)}},
+		{"Validasi syntax Nginx", []string{"sudo", "nginx", "-t"}},
+		{"Reload service Nginx", []string{"sudo", "systemctl", "reload", "nginx"}},
 	}
 
-	for i, cmdArgs := range commands {
-		cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)
+	for i, step := range steps {
+		fmt.Printf("[%d/4] %s...\n", i+1, step.Name)
+		cmd := exec.Command(step.Command[0], step.Command[1:]...)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			fmt.Printf("❌ Error di tahap %d: %s\n", i+1, string(output))
+			fmt.Printf("❌ Gagal di tahap: %s\nDetail: %s\n", step.Name, string(output))
 			return err
 		}
 	}
 
-	fmt.Printf("✅ Nginx untuk %s berhasil diaktifkan secara otomatis!\n", domain)
+	fmt.Printf("✅ Nginx untuk %s sudah aktif dan berjalan sempurna!\n", domain)
 	return nil
 }
