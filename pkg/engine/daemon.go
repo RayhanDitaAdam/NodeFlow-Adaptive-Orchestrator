@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"gonode/pkg/logger"
@@ -28,23 +29,19 @@ func RunDaemonLogic() {
 	startCmdStr := os.Getenv("GO_NODE_CMD")
 	startTime := time.Now()
 
-	// Use Project Name for log file
 	logFileName := fmt.Sprintf("%s.log", projectName)
 	logFile, _ := os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	fmt.Fprintf(logFile, "\n[%s] [SYSTEM] GoNode Engine Starting for Project: %s...\n", time.Now().Format("2006-01-02 15:04:05"), projectName)
 
-	// 1. Dependency Check (Auto-Install)
+	// 1. Dependency Check
 	if _, err := os.Stat("node_modules"); os.IsNotExist(err) {
 		fmt.Fprintf(logFile, "[%s] [SYSTEM] node_modules not found. Running npm install...\n", time.Now().Format("2006-01-02 15:04:05"))
-		installCmd := exec.Command("npm", "install")
-		installCmd.Stdout = logFile
-		installCmd.Stderr = logFile
-		installCmd.Run()
+		exec.Command("npm", "install").Run()
 	}
 
-	// 2. Build Check (For Frontend Apps)
-	if startCmdStr == "npm" {
-		fmt.Fprintf(logFile, "[%s] [SYSTEM] Frontend detected. Running npm run build...\n", time.Now().Format("2006-01-02 15:04:05"))
+	// 2. Build Check
+	if strings.Contains(startCmdStr, "npm") {
+		fmt.Fprintf(logFile, "[%s] [SYSTEM] NPM environment detected. Ensuring build...\n", time.Now().Format("2006-01-02 15:04:05"))
 		buildCmd := exec.Command("npm", "run", "build")
 		buildCmd.Stdout = logFile
 		buildCmd.Stderr = logFile
@@ -53,8 +50,9 @@ func RunDaemonLogic() {
 
 	// 3. Spawning Main Process
 	var nodeCmd *exec.Cmd
-	if startCmdStr == "npm" {
-		nodeCmd = exec.Command("npm", "start")
+	if strings.HasPrefix(startCmdStr, "npm") {
+		args := strings.Fields(startCmdStr)
+		nodeCmd = exec.Command(args[0], args[1:]...)
 	} else {
 		nodeCmd = exec.Command("node", fmt.Sprintf("--max-old-space-size=%s", mem), entry)
 	}
@@ -72,7 +70,7 @@ func RunDaemonLogic() {
 		return
 	}
 
-	fmt.Fprintf(logFile, "[%s] [SYSTEM] App launched successfully!\n", time.Now().Format("2006-01-02 15:04:05"))
+	fmt.Fprintf(logFile, "[%s] [SYSTEM] App launched with command: %s\n", time.Now().Format("2006-01-02 15:04:05"), startCmdStr)
 
 	go logger.ProcessLog(stdoutPipe, "[INFO]", logFile)
 	go logger.ProcessLog(stderrPipe, "[ERROR]", logFile)
@@ -89,7 +87,7 @@ func RunDaemonLogic() {
 			req := scanner.Text()
 			switch req {
 			case "list":
-				res := fmt.Sprintf("Project: %s | Profile: %s | Uptime: %s\n", projectName, profileName, time.Since(startTime).Round(time.Second))
+				res := fmt.Sprintf("Project: %s | Profile: %s | Status: Running | Uptime: %s\n", projectName, profileName, time.Since(startTime).Round(time.Second))
 				conn.Write([]byte(res))
 			case "stop":
 				conn.Write([]byte(fmt.Sprintf("Stopping GoNode Engine for %s...\n", projectName)))

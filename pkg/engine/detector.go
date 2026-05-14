@@ -1,48 +1,57 @@
 package engine
 
 import (
+	"encoding/json"
 	"os"
 	"strings"
-
-	"github.com/AlecAivazis/survey/v2"
 )
 
-// SmartDetect analyzes the project folder to identify frameworks and entry points
+type PackageJSON struct {
+	Scripts map[string]string `json:"scripts"`
+}
+
+// SmartDetect analyzes the project to find the best start command and entry point
 func SmartDetect() (string, string) {
-	// Heuristic: Cek package.json
 	data, err := os.ReadFile("package.json")
 	if err != nil {
-		return "app.js", "node" // Default
+		return "app.js", "node"
 	}
 
 	content := string(data)
-	if strings.Contains(content, "\"next\"") {
-		return "Next.js App", "npm"
-	}
-	if strings.Contains(content, "\"react\"") {
-		return "React App", "npm"
-	}
-	
-	// Cek file populer untuk backend
-	for _, f := range []string{"server.js", "app.js", "index.js", "main.js"} {
-		if _, err := os.Stat(f); err == nil {
-			return f, "node"
+	var pkg PackageJSON
+	json.Unmarshal(data, &pkg)
+
+	// 1. Check for Vite (Very common for modern React apps)
+	if strings.Contains(content, "vite") {
+		if _, ok := pkg.Scripts["preview"]; ok {
+			return "vite-project", "npm run preview"
+		}
+		if _, ok := pkg.Scripts["dev"]; ok {
+			return "vite-project (dev)", "npm run dev"
 		}
 	}
-	
-	return "app.js", "node"
+
+	// 2. Check for Next.js
+	if strings.Contains(content, "\"next\"") {
+		return "Next.js App", "npm start"
+	}
+
+	// 3. Check for standard NPM start
+	if _, ok := pkg.Scripts["start"]; ok {
+		return "Node.js (NPM)", "npm start"
+	}
+
+	// 4. Fallback to direct Node
+	return "main.js", "node"
 }
 
-// FindBackendEntry helps users find the main file for their backend
+// FindBackendEntry looks for common entry files
 func FindBackendEntry() string {
-	files := []string{"app.js", "server.js", "index.js", "main.js"}
+	files := []string{"index.js", "app.js", "server.js", "main.js"}
 	for _, f := range files {
 		if _, err := os.Stat(f); err == nil {
 			return f
 		}
 	}
-	
-	var res string
-	survey.AskOne(&survey.Input{Message: "Gak nemu entry point. Masukin manual (contoh: main.js):"}, &res)
-	return res
+	return "index.js"
 }
