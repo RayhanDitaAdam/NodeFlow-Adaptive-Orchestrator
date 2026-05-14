@@ -4,7 +4,7 @@
 [![Node Version](https://img.shields.io/badge/Node-18+-green.svg)](https://nodejs.org)
 [![Nginx](https://img.shields.io/badge/Nginx-Automated-brightgreen.svg)](#)
 
-GoNode is a high-performance orchestration engine that manages Node.js applications and automates Nginx reverse proxy configurations with intelligent profiling.
+GoNode is a high-performance orchestration engine that manages Node.js applications and automates Nginx reverse proxy configurations with intelligent profiling
 
 ---
 
@@ -35,13 +35,13 @@ graph TD
 
 ## Key Features
 
-- **Smart IP Detection**: Automatically fetches your server's **Public IP** for instant access without a domain.
-- **Nginx Automation**: Automatically generate and apply Nginx configs for **Public (Domain)** or **Local (IP)** access.
-- **DNS Propagation Check**: Integrated tool to verify if your domain points to your server before setup.
-- **Smart AI Detection**: **Smart Scan** identifies if your app is Frontend (Next.js/React) or Backend (Node.js).
-- **Adaptive Profiles**: Select hardware-optimized specs (**Eco**, **Balanced**, **Power**) with one click.
-- **Daemon Mode**: Runs in the background, detached from your terminal using Unix Sockets.
-- **Log Management**: High-precision timestamps and automatic log rotation at 1MB.
+- **Smart IP Detection**: Automatically fetches your server's **Public IP** for instant access without a domain
+- **Nginx Automation**: Automatically generate and apply Nginx configs for **Public (Domain)** or **Local (IP)** access
+- **DNS Propagation Check**: Integrated tool to verify if your domain points to your server before setup
+- **Smart AI Detection**: **Smart Scan** identifies if your app is Frontend (Next.js/React) or Backend (Node.js)
+- **Adaptive Profiles**: Select hardware-optimized specs (**Eco**, **Balanced**, **Power**) with one click
+- **Daemon Mode**: Runs in the background, detached from your terminal using Unix Sockets
+- **Log Management**: High-precision timestamps and automatic log rotation at 1MB
 
 ---
 
