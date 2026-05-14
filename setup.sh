@@ -29,8 +29,8 @@ show_footer() {
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "System is now configured for GoNode."
     echo -e "\n${BOLD}To start the application, run:${NC}"
-    echo -e "👉 ${CYAN}go run main.go start${NC}"
-    echo -e "👉 ${CYAN}./install.sh${NC} (to build the binary)"
+    echo -e "1. ./install.sh (to build & setup global command)"
+    echo -e "2. gonode start (from any project folder)"
     echo -e "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
 }
 

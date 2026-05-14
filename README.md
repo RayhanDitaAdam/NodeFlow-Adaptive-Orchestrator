@@ -1,6 +1,6 @@
 # 🚀 GoNode - Adaptive Infrastructure Engine
 
-[![Go Version](https://img.shields.io/badge/Go-1.26.3-blue.svg)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/Go-1.23-blue.svg)](https://golang.org)
 [![Node Version](https://img.shields.io/badge/Node-18+-green.svg)](https://nodejs.org)
 [![Nginx](https://img.shields.io/badge/Nginx-Automated-brightgreen.svg)](#)
 
