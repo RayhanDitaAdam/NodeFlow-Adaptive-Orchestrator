@@ -17,6 +17,10 @@ import (
 )
 
 func HandleStartCommand() {
+	// 0. Project Name
+	projectName := ""
+	survey.AskOne(&survey.Input{Message: "0. Enter Project Name (for logging & identification):", Default: "myapp"}, &projectName)
+
 	// 1. Select Profile
 	profiles := map[string]ServerProfile{
 		"Eco (512MB RAM)":    {Name: "Eco", MaxWorkers: 1, NodeEnv: "production", MemoryHeap: "256"},
@@ -61,7 +65,7 @@ func HandleStartCommand() {
 	// 3. Last Confirmation
 	confirm := false
 	survey.AskOne(&survey.Confirm{
-		Message: fmt.Sprintf("Ready to launch %s with %s profile?", entryPoint, selectedProfile),
+		Message: fmt.Sprintf("Ready to launch %s (%s) with %s profile?", projectName, entryPoint, selectedProfile),
 		Default: true,
 	}, &confirm)
 
@@ -103,14 +107,11 @@ func HandleStartCommand() {
 		}
 	}
 
-	launchDaemon(profiles[selectedProfile], entryPoint, startCmd)
+	launchDaemon(profiles[selectedProfile], entryPoint, startCmd, projectName)
 }
 
 func getPublicIP() string {
-	client := http.Client{
-		Timeout: 5 * time.Second,
-	}
-	// api.ipify.org is more reliable for plain text IP
+	client := http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Get("https://api.ipify.org")
 	if err != nil {
 		return getLocalIP()
@@ -135,9 +136,10 @@ func getLocalIP() string {
 	return "localhost"
 }
 
-func launchDaemon(config ServerProfile, entryPoint string, startCmd string) {
+func launchDaemon(config ServerProfile, entryPoint string, startCmd string, projectName string) {
 	cmd := exec.Command(os.Args[0], "daemon-logic")
 	cmd.Env = append(os.Environ(),
+		fmt.Sprintf("GO_NODE_PROJECT_NAME=%s", projectName),
 		fmt.Sprintf("GO_NODE_NAME=%s", config.Name),
 		fmt.Sprintf("GO_NODE_MEM=%s", config.MemoryHeap),
 		fmt.Sprintf("GO_NODE_WORKERS=%d", config.MaxWorkers),
@@ -153,9 +155,8 @@ func launchDaemon(config ServerProfile, entryPoint string, startCmd string) {
 		return
 	}
 
-	fmt.Printf("\nGoNode [%s] launched to background! Use 'gonode list' to monitor.\n", config.Name)
-	fmt.Println("Note: If this is the first run, GoNode is currently running 'npm install' & 'build' in the background.")
-	fmt.Println("Check 'gonode.log' for build progress.")
+	fmt.Printf("\nGoNode [%s] launched to background! Use 'gonode list' to monitor.\n", projectName)
+	fmt.Printf("To view logs, run: gonode logs %s\n", projectName)
 }
 
 func SendCommand(cmd string) {

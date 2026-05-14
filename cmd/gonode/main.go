@@ -28,6 +28,12 @@ func main() {
 		}
 	case "list":
 		engine.SendCommand("list")
+	case "logs":
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: gonode logs <project-name>")
+			return
+		}
+		utils.TailLogs(os.Args[2])
 	case "stop":
 		engine.SendCommand("stop")
 	case "help":

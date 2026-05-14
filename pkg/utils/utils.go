@@ -3,6 +3,8 @@ package utils
 import (
 	"fmt"
 	"net"
+	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -13,13 +15,29 @@ func PrintHelp() {
 	fmt.Println("\nAvailable Commands:")
 	fmt.Printf("  %-20s %s\n", "start", "Launch GoNode with interactive profile selection.")
 	fmt.Printf("  %-20s %s\n", "list", "Show the status of apps running in the background.")
-	fmt.Printf("  %-20s %s\n", "stop", "Stop the GoNode Engine and managed instances.")
+	fmt.Printf("  %-20s %s\n", "logs <name>", "View real-time logs for a specific project.")
+	fmt.Printf("  %-20s %s\n", "stop", "Stop the GoNode Engine.")
 	fmt.Printf("  %-20s %s\n", "check propagation", "Verify if a domain resolves to the expected IP.")
 	fmt.Printf("  %-20s %s\n", "help nginx", "Specific guide for Nginx configuration.")
 	fmt.Println("\nExamples:")
 	fmt.Println("  gonode start")
-	fmt.Println("  gonode check propagation google.com 142.251.12.102")
+	fmt.Println("  gonode logs myapp")
 	fmt.Println("")
+}
+
+// TailLogs follows the log file for a project
+func TailLogs(projectName string) {
+	logFileName := fmt.Sprintf("%s.log", projectName)
+	if _, err := os.Stat(logFileName); os.IsNotExist(err) {
+		fmt.Printf("Error: Log file %s not found. Is the project running?\n", logFileName)
+		return
+	}
+
+	fmt.Printf("Showing real-time logs for: %s (Ctrl+C to exit)\n", projectName)
+	cmd := exec.Command("tail", "-f", logFileName)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
 }
 
 // CheckPropagation verifies if a domain resolves to the expected IP

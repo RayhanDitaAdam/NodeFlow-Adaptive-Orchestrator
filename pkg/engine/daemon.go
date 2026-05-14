@@ -19,7 +19,8 @@ func RunDaemonLogic() {
 	}
 	defer l.Close()
 
-	name := os.Getenv("GO_NODE_NAME")
+	projectName := os.Getenv("GO_NODE_PROJECT_NAME")
+	profileName := os.Getenv("GO_NODE_NAME")
 	mem := os.Getenv("GO_NODE_MEM")
 	workers := os.Getenv("GO_NODE_WORKERS")
 	env := os.Getenv("GO_NODE_ENV")
@@ -27,8 +28,10 @@ func RunDaemonLogic() {
 	startCmdStr := os.Getenv("GO_NODE_CMD")
 	startTime := time.Now()
 
-	logFile, _ := os.OpenFile("gonode.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	fmt.Fprintf(logFile, "\n[%s] [SYSTEM] GoNode Engine Starting...\n", time.Now().Format("2006-01-02 15:04:05"))
+	// Use Project Name for log file
+	logFileName := fmt.Sprintf("%s.log", projectName)
+	logFile, _ := os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	fmt.Fprintf(logFile, "\n[%s] [SYSTEM] GoNode Engine Starting for Project: %s...\n", time.Now().Format("2006-01-02 15:04:05"), projectName)
 
 	// 1. Dependency Check (Auto-Install)
 	if _, err := os.Stat("node_modules"); os.IsNotExist(err) {
@@ -73,7 +76,7 @@ func RunDaemonLogic() {
 
 	go logger.ProcessLog(stdoutPipe, "[INFO]", logFile)
 	go logger.ProcessLog(stderrPipe, "[ERROR]", logFile)
-	go logger.MonitorLogSize("gonode.log", 1*1024*1024)
+	go logger.MonitorLogSize(logFileName, 1*1024*1024)
 
 	for {
 		conn, err := l.Accept()
@@ -86,10 +89,10 @@ func RunDaemonLogic() {
 			req := scanner.Text()
 			switch req {
 			case "list":
-				res := fmt.Sprintf("App: %s | Profile: %s | Status: Running | Uptime: %s\n", entry, name, time.Since(startTime).Round(time.Second))
+				res := fmt.Sprintf("Project: %s | Profile: %s | Uptime: %s\n", projectName, profileName, time.Since(startTime).Round(time.Second))
 				conn.Write([]byte(res))
 			case "stop":
-				conn.Write([]byte("Stopping GoNode Engine...\n"))
+				conn.Write([]byte(fmt.Sprintf("Stopping GoNode Engine for %s...\n", projectName)))
 				nodeCmd.Process.Kill()
 				os.Remove(SOCKET_FILE)
 				os.Exit(0)
