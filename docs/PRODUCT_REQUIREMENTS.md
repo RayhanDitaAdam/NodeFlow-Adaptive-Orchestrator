@@ -1,7 +1,7 @@
-# 📄 GoNode - Product Requirements Document (PRD)
+# GoNode - Product Requirements Document (PRD)
 
 ## 1. Vision & Overview
-**GoNode** is a high-performance orchestration engine written in Go, designed to manage, monitor, and scale Node.js applications with adaptive resource profiling and automated Nginx configuration.
+GoNode is a high-performance orchestration engine written in Go, designed to manage, monitor, and scale Node.js applications with adaptive resource profiling and automated Nginx configuration.
 
 ## 2. Target Audience
 - DevOps engineers seeking a lightweight process manager.
@@ -15,12 +15,12 @@
 
 ### 3.2 Intelligent Application Detection (Smart Scan)
 - **Framework Awareness**: Automatically detects Next.js, React, or standard Node.js applications.
-- **Auto-Config**: Configures the appropriate start command (`npm start` or `node [entry]`) based on the project type.
+- **Auto-Config**: Configures the appropriate start command based on the project type.
 
 ### 3.3 Nginx Orchestration (Automated Reverse Proxy)
 - **Zero-Manual Config**: Generates and applies Nginx configurations automatically.
-- **Exposure Options**: Supports both **Public Domain** and **Local IP** setups.
-- **Smart IP Detection**: Automatically fetches the server's **Public IP** using external providers to ensure external reachability.
+- **Exposure Options**: Supports both Public Domain and Local IP setups.
+- **Smart IP Detection**: Automatically fetches the server's Public IP using external providers to ensure external reachability.
 
 ### 3.4 DNS Propagation Checker
 - **Real-time Verification**: Tool to verify if a domain is correctly pointing to the server's IP before proceeding with the setup.

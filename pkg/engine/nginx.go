@@ -29,23 +29,21 @@ func SetupNginx(domain string, port string) error {
 	config := GenerateNginxConfig(domain, port)
 	tmpFile := fmt.Sprintf("/tmp/%s.conf", domain)
 	
-	// 1. Write to a temporary file
 	err := os.WriteFile(tmpFile, []byte(config), 0644)
 	if err != nil {
-		return fmt.Errorf("failed to write temporary file: %v", err)
+		return err
 	}
 
-	fmt.Printf("\nAI Orchestrator: Starting Nginx configuration for %s\n", domain)
+	fmt.Printf("\nConfiguring Nginx for %s\n", domain)
 
-	// 2. Execute sudo command sequence automatically
 	steps := []struct {
 		Name    string
 		Command []string
 	}{
-		{"Move config to sites-available", []string{"sudo", "mv", tmpFile, fmt.Sprintf("/etc/nginx/sites-available/%s", domain)}},
-		{"Enable symlink to sites-enabled", []string{"sudo", "ln", "-sf", fmt.Sprintf("/etc/nginx/sites-available/%s", domain), fmt.Sprintf("/etc/nginx/sites-enabled/%s", domain)}},
-		{"Validate Nginx syntax", []string{"sudo", "nginx", "-t"}},
-		{"Reload Nginx service", []string{"sudo", "systemctl", "reload", "nginx"}},
+		{"Move config", []string{"sudo", "mv", tmpFile, fmt.Sprintf("/etc/nginx/sites-available/%s", domain)}},
+		{"Enable symlink", []string{"sudo", "ln", "-sf", fmt.Sprintf("/etc/nginx/sites-available/%s", domain), fmt.Sprintf("/etc/nginx/sites-enabled/%s", domain)}},
+		{"Validate syntax", []string{"sudo", "nginx", "-t"}},
+		{"Reload service", []string{"sudo", "systemctl", "reload", "nginx"}},
 	}
 
 	for i, step := range steps {
@@ -53,11 +51,11 @@ func SetupNginx(domain string, port string) error {
 		cmd := exec.Command(step.Command[0], step.Command[1:]...)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			fmt.Printf("Error: Failed at stage: %s\nDetail: %s\n", step.Name, string(output))
+			fmt.Printf("Error: %s\n", string(output))
 			return err
 		}
 	}
 
-	fmt.Printf("Success! Nginx for %s is now active and running perfectly!\n", domain)
+	fmt.Printf("Nginx for %s is active.\n", domain)
 	return nil
 }
