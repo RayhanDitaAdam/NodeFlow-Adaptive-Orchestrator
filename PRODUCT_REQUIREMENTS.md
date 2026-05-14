@@ -11,38 +11,37 @@
 ## 3. Core Features
 
 ### 3.1 Adaptive Profiling
-- Users can select from predefined profiles (**Eco**, **Balanced**, **Power**).
-- Automatically adjusts Node.js `max-old-space-size`, worker counts, and environment variables based on the selected profile.
+- Predefined profiles (**Eco**, **Balanced**, **Power**).
+- Automatic adjustment of Node.js `max-old-space-size`, workers, and memory heap.
 
 ### 3.2 Smart Application Detection (Heuristic AI)
-- **Smart Scan**: Analyzes `package.json` and project structure to identify frameworks.
-- **Frontend Support**: Built-in orchestration for Next.js and React applications using `npm start`.
-- **Backend Support**: Automatically discovers entry points like `app.js`, `server.js`, or `index.js`.
+- **Smart Scan**: Analyzes `package.json` to identify frameworks (Next.js/React).
+- **Backend/Frontend**: Custom orchestration paths for different app types.
 
-### 3.3 Daemonization & Process Management
-- Runs as a background process using Unix `setsid`.
-- Decouples the lifecycle of the engine from the terminal session.
-- Graceful stop mechanism for both the engine and the managed Node.js instances.
+### 3.3 Nginx Orchestration (Reverse Proxy Automation)
+- **Automated Config**: Generates Nginx `.conf` files based on domain and port.
+- **Reverse Proxy Setup**: Pre-configured headers for WebSocket support, Host forwarding, and Upgrade headers.
+- **Simplification**: Eliminates manual Nginx syntax errors for beginners.
 
-### 3.4 Real-time Log Management
-- **Timestamping**: Intercepts and tags Node.js output with high-precision timestamps.
-- **Rotation**: Automatically truncates log files once they reach 1MB.
+### 3.4 Daemonization & Process Management
+- Background execution via Unix `setsid`.
+- Decoupled process lifecycles and graceful shutdowns.
 
-### 3.5 CLI & Control Plane
+### 3.5 Real-time Log Management
+- **Timestamping**: Tagging output with precise timestamps.
+- **Rotation**: Automatic truncation at 1MB to save disk space.
+
+### 3.6 CLI & Control Plane
 - Communication via **Unix Sockets** (`/tmp/gonode.sock`).
-- Commands: `start`, `stop`, `list`, `help`.
-
-### 3.6 Automated Environment Setup
-- Interactive setup script for Ubuntu/Debian with automatic dependency installation.
 
 ## 4. Technical Stack
 - **Engine**: Go (Golang)
-- **Refactored Architecture**: Modular design (pkg/engine, pkg/logger, pkg/utils).
+- **Proxy/Gateway**: Nginx (Automated)
 - **Runtime**: Node.js / NPM.
 - **IPC**: Unix Domain Sockets.
 
 ## 5. Future Roadmap
-- [ ] Multi-instance support (Multiple Node apps).
+- [ ] Automated SSL (Certbot/LetsEncrypt) integration.
 - [ ] Real-time CPU/RAM monitoring in `list` command.
 - [ ] Auto-restart on failure (Watchdog).
 - [ ] Web-based monitoring dashboard.

@@ -53,7 +53,7 @@ run_package_installation() {
     log_step "2/2" "Installing dependencies (Golang, Node.js, Build Tools)"
     log_info "Please enter your password if prompted."
     
-    if sudo apt install -y golang nodejs npm build-essential; then
+    if sudo apt install -y golang nodejs npm build-essential nginx; then
         log_success "All packages installed successfully."
         return 0
     else

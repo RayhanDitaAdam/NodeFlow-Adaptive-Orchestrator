@@ -65,6 +65,24 @@ func HandleStartCommand() {
 		return
 	}
 
+	// 4. Setup Nginx (Optional)
+	setupNginxPrompt := false
+	survey.AskOne(&survey.Confirm{
+		Message: "4. Setup Nginx Reverse Proxy?",
+		Default: false,
+	}, &setupNginxPrompt)
+
+	if setupNginxPrompt {
+		domain := ""
+		port := "3000"
+		survey.AskOne(&survey.Input{Message: "Masukkan Domain (contoh: myapp.com):"}, &domain)
+		survey.AskOne(&survey.Input{Message: "Masukkan Port Aplikasi (default 3000):", Default: "3000"}, &port)
+		
+		if domain != "" {
+			SetupNginx(domain, port)
+		}
+	}
+
 	launchDaemon(profiles[selectedProfile], entryPoint, startCmd)
 }
 

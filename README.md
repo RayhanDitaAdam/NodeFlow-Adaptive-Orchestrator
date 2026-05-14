@@ -2,68 +2,77 @@
 
 [![Go Version](https://img.shields.io/badge/Go-1.26.3-blue.svg)](https://golang.org)
 [![Node Version](https://img.shields.io/badge/Node-18+-green.svg)](https://nodejs.org)
-[![OS](https://img.shields.io/badge/OS-Ubuntu%20%7C%20Debian-orange.svg)](#)
+[![Nginx](https://img.shields.io/badge/Nginx-Automated-brightgreen.svg)](#)
 
-GoNode is a high-performance orchestration engine written in Go, designed to manage, monitor, and scale Node.js applications with adaptive resource profiling.
-
----
-
-## ✨ New: Smart AI Detection
-GoNode now features **Smart Scan**, a heuristic-based detection system that automatically identifies your project type:
-- **Frontend**: Detects Next.js or React and configures `npm start` automatically.
-- **Backend**: Scans for `app.js`, `server.js`, or `index.js` and configures the Node.js runtime.
+GoNode is a high-performance orchestration engine that manages Node.js applications and automates Nginx reverse proxy configurations.
 
 ---
 
-## 📐 High-Level Architecture
+## 📐 Application Flow
+
+GoNode sits between your OS and your Application, acting as the supervisor that even talks to Nginx for you.
 
 ```mermaid
 graph TD
-    User((🌐 CLI User)) -->|Socket| GoNode[("🚀 GoNode Engine")]
+    Client((🌐 Internet)) -->|Port 80| Nginx[("🛡️ Nginx (Reverse Proxy)")]
+    Nginx -->|Proxy Pass| NodeApp["📦 Managed Node.js App"]
     
-    subgraph "Intelligent Orchestration"
-    GoNode -->|1. Smart Scan| Detector[Next.js / Node.js / React]
-    GoNode -->|2. Profile Selection| Spec[Eco / Balanced / Power]
-    GoNode -->|3. Process Spawn| NodeApp["📦 Managed App"]
+    subgraph "GoNode Management"
+    GoNode[("🚀 GoNode Engine")] -->|1. Setup| Nginx
+    GoNode -->|2. Smart Scan| Detector[Next.js / Node.js]
+    GoNode -->|3. Orchestrate| NodeApp
     end
 
     subgraph "Observability"
-    NodeApp -->|Output| Logger["📝 Timestamped Logger"]
-    Logger -->|Rotation| LogFile["gonode.log (1MB Limit)"]
+    NodeApp -->|Logs| Logger["📝 Timestamped Logger"]
+    Logger -->|Rotate| LogFile["gonode.log (1MB)"]
     end
 ```
 
 ---
 
-## 📂 Project Structure (Modular Design)
+## ✨ Features
+
+- **Nginx Automation**: Automatically generate Nginx reverse proxy configs for your domains.
+- **Smart AI Detection**: **Smart Scan** identifies if your app is Frontend (Next.js/React) or Backend.
+- **Adaptive Profiles**: Select hardware-optimized specs (Eco, Balanced, Power).
+- **Daemon Mode**: Runs in the background, detached from your terminal.
+- **Log Management**: Precise timestamps and automatic rotation at 1MB.
+
+---
+
+## 📂 Project Structure
 
 ```text
 GoNode/
-├── main.go            # Entry Point
+├── main.go            # CLI Entry Point
 ├── pkg/
-│   ├── engine/        # Core: cli.go, daemon.go, detector.go
-│   ├── logger/        # Logging & Rotation logic
-│   └── utils/         # UI & Installer Helpers
-├── setup.sh           # Environment Setup
-└── install.sh         # Build Script
+│   ├── engine/        # cli, daemon, detector, nginx logic
+│   ├── logger/        # Logging & Rotation
+│   └── utils/         # UI & Installer
+├── setup.sh           # Environment Setup (Go, Node, Nginx)
+└── install.sh         # Binary Builder
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Setup Environment
+### 1. Environment Setup
 ```bash
-chmod +x setup.sh && ./setup.sh
+./setup.sh
 ```
 
-### 2. Launch with Smart Scan
+### 2. Launch & Configure
 ```bash
 go run main.go start
 ```
-> Select **Smart Scan (AI Detect)** to let GoNode automatically configure your app!
+1. Select **RAM Profile**.
+2. Select **App Type** (use Smart Scan).
+3. Confirm Launch.
+4. Select **Yes** for **Nginx Setup** and follow the prompts.
 
-### 3. Monitor
+### 3. Monitoring
 ```bash
 ./gonode list
 ```
