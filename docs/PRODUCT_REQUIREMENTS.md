@@ -19,7 +19,8 @@
 
 ### 3.3 Nginx Orchestration (Automated Reverse Proxy)
 - **Zero-Manual Config**: Generates and applies Nginx configurations automatically.
-- **Production Ready**: Pre-configured with WebSocket support, proxy headers, and host forwarding.
+- **Exposure Options**: Supports both **Public Domain** and **Local IP** setups.
+- **Smart IP Detection**: Automatically fetches the server's **Public IP** using external providers to ensure external reachability.
 
 ### 3.4 DNS Propagation Checker
 - **Real-time Verification**: Tool to verify if a domain is correctly pointing to the server's IP before proceeding with the setup.

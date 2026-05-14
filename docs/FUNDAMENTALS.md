@@ -17,10 +17,10 @@ GoNode follows the **Standard Go Project Layout**:
 - **`cmd/gonode/`**: 
   - **Entry Point**: Contains `main.go`. Its primary role is to handle CLI arguments and route them to the appropriate package logic.
 - **`pkg/engine/`** (The Core Brain):
-  - `cli.go`: Handles interactive menus and user inputs during `gonode start`.
+  - `cli.go`: Handles interactive menus, user inputs, and **Intelligent IP Detection**.
   - `daemon.go`: The background engine. It spawns the Node.js process and listens for commands via Unix Sockets.
   - `detector.go`: The "Smart Scan" heuristic logic that identifies if your app is Next.js or Node.js.
-  - `nginx.go`: Handles the automated generation and application of Nginx configurations.
+  - `nginx.go`: Handles the automated generation and application of Nginx configurations for both Domain and IP exposure.
 - **`pkg/logger/`** (The Watchman):
   - Manages real-time log timestamping and handles file rotation when logs reach 1MB.
 - **`pkg/utils/`** (The Assistant):
@@ -45,8 +45,8 @@ We use `structs` to define RAM profiles (Eco/Balanced/Power). These serve as str
 ### D. OS Exec
 The primary job of GoNode is to execute system commands (like `node app.js` or `npm start`). We use the `os/exec` library to spawn these processes and capture their output streams.
 
-### E. Interfaces
-We use the `io.ReadCloser` interface for logging. Interfaces allow our code to be flexible; the logger doesn't care if the data comes from a standard output, an error stream, or a network pipe.
+### E. Network Logic (`net/http`)
+In `cli.go`, we use `net/http` to communicate with external services to fetch the server's **Public IP**. This ensures that even when deploying "locally" via IP, the application is reachable from external devices.
 
 ---
 
@@ -55,7 +55,7 @@ We use the `io.ReadCloser` interface for logging. Interfaces allow our code to b
 2. **Build**: Run `./install.sh` to compile the Go source into the `gonode` binary.
 3. **Start**: Run `gonode start` (global) or `./gonode start`.
 4. **Orchestration**: GoNode detaches to the background, manages the Node app, and rotates logs.
-5. **Gateway**: GoNode configures Nginx to make your site accessible via your domain.
+5. **Gateway**: GoNode configures Nginx (Domain or IP-based) to make your site accessible.
 
 ---
 

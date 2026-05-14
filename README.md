@@ -17,7 +17,7 @@ graph TD
     subgraph "GoNode Control Plane"
     CLI[("CLI User")] -->|1. Profiling| Engine
     Engine[("GoNode Engine")] -->|2. Smart Scan| Detector{Frontend / Backend}
-    Engine -->|3. DNS Check| DNS[Propagation Verify]
+    Engine -->|3. Network Check| Net[Public IP / DNS Check]
     Engine -->|4. Automation| Nginx
     Engine -->|5. Orchestrate| NodeApp["Managed App"]
     end
@@ -35,6 +35,7 @@ graph TD
 
 ## Key Features
 
+- **Smart IP Detection**: Automatically fetches your server's **Public IP** for instant access without a domain.
 - **Nginx Automation**: Automatically generate and apply Nginx configs for **Public (Domain)** or **Local (IP)** access.
 - **DNS Propagation Check**: Integrated tool to verify if your domain points to your server before setup.
 - **Smart AI Detection**: **Smart Scan** identifies if your app is Frontend (Next.js/React) or Backend (Node.js).
@@ -85,7 +86,7 @@ gonode start
 3. Confirm Launch
 4. Select **Yes** for **Nginx Setup**
 5. Choose **Exposure Type**: **Public** (Domain) or **Local** (IP)
-6. Follow the prompts for automated setup
+6. GoNode automatically detects your **Public IP** if Local is selected
 
 ### 4. Monitoring
 ```bash
