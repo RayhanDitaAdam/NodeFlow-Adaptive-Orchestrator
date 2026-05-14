@@ -29,10 +29,10 @@ func RunDaemonLogic() {
 
 	var nodeCmd *exec.Cmd
 	if startCmdStr == "npm" {
-		// Untuk Frontend (Next.js/React)
+		// For Frontend (Next.js/React)
 		nodeCmd = exec.Command("npm", "start")
 	} else {
-		// Untuk Backend (Node.js)
+		// For Backend (Node.js)
 		nodeCmd = exec.Command("node", fmt.Sprintf("--max-old-space-size=%s", mem), entry)
 	}
 
@@ -47,7 +47,7 @@ func RunDaemonLogic() {
 	stderrPipe, _ := nodeCmd.StderrPipe()
 
 	if err := nodeCmd.Start(); err != nil {
-		fmt.Fprintf(logFile, "[%s] [SYSTEM] Gagal menjalankan proses: %v\n", time.Now().Format("2006-01-02 15:04:05"), err)
+		fmt.Fprintf(logFile, "[%s] [SYSTEM] Failed to start process: %v\n", time.Now().Format("2006-01-02 15:04:05"), err)
 		return
 	}
 
@@ -69,7 +69,7 @@ func RunDaemonLogic() {
 				res := fmt.Sprintf("App: %s | Profile: %s | Workers: %s | Uptime: %s\n", entry, name, workers, time.Since(startTime).Round(time.Second))
 				conn.Write([]byte(res))
 			case "stop":
-				conn.Write([]byte("🛑 Menghentikan GoNode Engine...\n"))
+				conn.Write([]byte("🛑 Stopping GoNode Engine...\n"))
 				nodeCmd.Process.Kill()
 				os.Remove(SOCKET_FILE)
 				os.Exit(0)

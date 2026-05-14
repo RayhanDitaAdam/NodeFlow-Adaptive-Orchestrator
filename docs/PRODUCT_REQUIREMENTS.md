@@ -1,47 +1,44 @@
 # 📄 GoNode - Product Requirements Document (PRD)
 
 ## 1. Vision & Overview
-**GoNode** is a lightweight, adaptive infrastructure engine designed to orchestrate Node.js applications using Go's efficiency. It provides a bridge between low-level system management (Go) and high-level application logic (Node.js), allowing developers to run adaptive workloads with minimal overhead.
+**GoNode** is a high-performance orchestration engine written in Go, designed to manage, monitor, and scale Node.js applications with adaptive resource profiling and automated Nginx configuration.
 
 ## 2. Target Audience
-- DevOps engineers looking for a lightweight process manager.
-- Node.js developers who need adaptive resource allocation.
-- Infrastructure enthusiasts building "Home Server" or "Edge Computing" solutions.
+- DevOps engineers seeking a lightweight process manager.
+- Node.js developers requiring adaptive resource allocation.
+- Infrastructure enthusiasts building Edge Computing or Home Server solutions.
 
 ## 3. Core Features
 
 ### 3.1 Adaptive Profiling
-- Predefined profiles (**Eco**, **Balanced**, **Power**).
-- Automatic adjustment of Node.js `max-old-space-size`, workers, and memory heap.
+- **Eco, Balanced, Power Profiles**: Automatically optimizes Node.js memory (`max-old-space-size`), worker counts, and system environments.
 
-### 3.2 Smart Application Detection (Heuristic AI)
-- **Smart Scan**: Analyzes `package.json` to identify frameworks (Next.js/React).
-- **Backend/Frontend**: Custom orchestration paths for different app types.
+### 3.2 Intelligent Application Detection (Smart Scan)
+- **Framework Awareness**: Automatically detects Next.js, React, or standard Node.js applications.
+- **Auto-Config**: Configures the appropriate start command (`npm start` or `node [entry]`) based on the project type.
 
-### 3.3 Nginx Orchestration (Reverse Proxy Automation)
-- **Automated Config**: Generates Nginx `.conf` files based on domain and port.
-- **Reverse Proxy Setup**: Pre-configured headers for WebSocket support, Host forwarding, and Upgrade headers.
-- **Simplification**: Eliminates manual Nginx syntax errors for beginners.
+### 3.3 Nginx Orchestration (Automated Reverse Proxy)
+- **Zero-Manual Config**: Generates and applies Nginx configurations automatically.
+- **Production Ready**: Pre-configured with WebSocket support, proxy headers, and host forwarding.
 
-### 3.4 Daemonization & Process Management
-- Background execution via Unix `setsid`.
-- Decoupled process lifecycles and graceful shutdowns.
+### 3.4 DNS Propagation Checker
+- **Real-time Verification**: Tool to verify if a domain is correctly pointing to the server's IP before proceeding with the setup.
 
 ### 3.5 Real-time Log Management
-- **Timestamping**: Tagging output with precise timestamps.
-- **Rotation**: Automatic truncation at 1MB to save disk space.
+- **Automated Rotation**: Truncates logs at 1MB to prevent disk overflow.
+- **Enhanced Observability**: High-precision timestamps for all process outputs.
 
-### 3.6 CLI & Control Plane
-- Communication via **Unix Sockets** (`/tmp/gonode.sock`).
+### 3.6 Global CLI & Control Plane
+- **Background Daemon**: Fully detached background execution.
+- **Unix Sockets**: High-speed local communication for process control.
 
 ## 4. Technical Stack
-- **Engine**: Go (Golang)
-- **Proxy/Gateway**: Nginx (Automated)
-- **Runtime**: Node.js / NPM.
-- **IPC**: Unix Domain Sockets.
+- **Engine**: Go (Golang) 1.23
+- **Automation**: Nginx
+- **Runtime**: Node.js / NPM
+- **Communication**: Unix Domain Sockets
 
-## 5. Future Roadmap
-- [ ] Automated SSL (Certbot/LetsEncrypt) integration.
-- [ ] Real-time CPU/RAM monitoring in `list` command.
-- [ ] Auto-restart on failure (Watchdog).
-- [ ] Web-based monitoring dashboard.
+## 5. Roadmap
+- [ ] Automated SSL integration (Let's Encrypt).
+- [ ] Multi-application orchestration in a single daemon.
+- [ ] Web-based monitoring UI.

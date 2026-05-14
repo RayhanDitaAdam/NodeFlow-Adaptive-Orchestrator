@@ -13,7 +13,7 @@ import (
 )
 
 func HandleStartCommand() {
-	// 1. Pilih Profil Hardware
+	// 1. Select Profile
 	profiles := map[string]ServerProfile{
 		"Eco (512MB RAM)":    {Name: "Eco", MaxWorkers: 1, NodeEnv: "production", MemoryHeap: "256"},
 		"Balanced (2GB RAM)": {Name: "Balanced", MaxWorkers: 4, NodeEnv: "production", MemoryHeap: "1024"},
@@ -24,16 +24,16 @@ func HandleStartCommand() {
 	profileOptions := []string{"Eco (512MB RAM)", "Balanced (2GB RAM)", "Power (8GB+ RAM)"}
 
 	if err := survey.AskOne(&survey.Select{
-		Message: "1. Pilih Profil Infrastruktur:",
+		Message: "1. Select Infrastructure Profile:",
 		Options: profileOptions,
 	}, &selectedProfile); err != nil {
 		log.Fatal(err)
 	}
 
-	// 2. Pilih Tipe Aplikasi & Smart Detection
+	// 2. Select App Type & Smart Detection
 	appType := ""
 	if err := survey.AskOne(&survey.Select{
-		Message: "2. Tipe Aplikasi Ente:",
+		Message: "2. Application Type:",
 		Options: []string{"Backend (API/Node.js)", "Frontend (Next.js/React)", "Smart Scan (AI Detect)"},
 	}, &appType); err != nil {
 		log.Fatal(err)
@@ -44,9 +44,9 @@ func HandleStartCommand() {
 	
 	switch appType {
 	case "Smart Scan (AI Detect)":
-		fmt.Println("🤖 AI sedang menganalisa folder project ente...")
+		fmt.Println("🤖 AI Orchestrator: Analyzing project structure...")
 		entryPoint, startCmd = SmartDetect()
-		fmt.Printf("✅ AI Menyarankan: Mode %s dengan Entry Point: %s\n", startCmd, entryPoint)
+		fmt.Printf("✅ AI Suggestion: Use %s mode with Entry Point: %s\n", startCmd, entryPoint)
 	case "Backend (API/Node.js)":
 		entryPoint = FindBackendEntry()
 	default:
@@ -54,15 +54,15 @@ func HandleStartCommand() {
 		startCmd = "npm"
 	}
 
-	// 3. Konfirmasi Terakhir
+	// 3. Last Confirmation
 	confirm := false
 	survey.AskOne(&survey.Confirm{
-		Message: fmt.Sprintf("Siap meluncurkan %s dengan profil %s?", entryPoint, selectedProfile),
+		Message: fmt.Sprintf("Ready to launch %s with %s profile?", entryPoint, selectedProfile),
 		Default: true,
 	}, &confirm)
 
 	if !confirm {
-		fmt.Println("❌ Dibatalkan.")
+		fmt.Println("❌ Cancelled.")
 		return
 	}
 
@@ -76,8 +76,8 @@ func HandleStartCommand() {
 	if setupNginxPrompt {
 		domain := ""
 		port := "3000"
-		survey.AskOne(&survey.Input{Message: "Masukkan Domain (contoh: myapp.com):"}, &domain)
-		survey.AskOne(&survey.Input{Message: "Masukkan Port Aplikasi (default 3000):", Default: "3000"}, &port)
+		survey.AskOne(&survey.Input{Message: "Enter Domain (e.g., myapp.com):"}, &domain)
+		survey.AskOne(&survey.Input{Message: "Enter App Port (default 3000):", Default: "3000"}, &port)
 		
 		if domain != "" {
 			SetupNginx(domain, port)
@@ -101,17 +101,17 @@ func launchDaemon(config ServerProfile, entryPoint string, startCmd string) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true} 
 
 	if err := cmd.Start(); err != nil {
-		fmt.Printf("❌ Gagal melepas proses ke background: %v\n", err)
+		fmt.Printf("❌ Failed to detach process to background: %v\n", err)
 		return
 	}
 
-	fmt.Printf("\n🚀 GoNode [%s] meluncur ke background! Manage pake 'gonode list'.\n", config.Name)
+	fmt.Printf("\n🚀 GoNode [%s] launched to background! Use 'gonode list' to monitor.\n", config.Name)
 }
 
 func SendCommand(cmd string) {
 	conn, err := net.Dial("unix", SOCKET_FILE)
 	if err != nil {
-		fmt.Println("❌ Daemon GoNode tidak ditemukan. Jalankan './gonode start' dulu.")
+		fmt.Println("❌ GoNode Daemon not found. Please run 'gonode start' first.")
 		return
 	}
 	defer conn.Close()

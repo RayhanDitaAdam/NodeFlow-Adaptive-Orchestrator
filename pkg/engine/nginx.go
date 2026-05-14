@@ -32,20 +32,20 @@ func SetupNginx(domain string, port string) error {
 	// 1. Write to a temporary file
 	err := os.WriteFile(tmpFile, []byte(config), 0644)
 	if err != nil {
-		return fmt.Errorf("gagal nulis file temp: %v", err)
+		return fmt.Errorf("failed to write temporary file: %v", err)
 	}
 
-	fmt.Printf("\n🤖 AI Orchestrator: Memulai konfigurasi Nginx untuk %s\n", domain)
+	fmt.Printf("\n🤖 AI Orchestrator: Starting Nginx configuration for %s\n", domain)
 
-	// 2. Jalankan rangkaian perintah sudo secara otomatis
+	// 2. Execute sudo command sequence automatically
 	steps := []struct {
 		Name    string
 		Command []string
 	}{
-		{"Pindahkan config ke sites-available", []string{"sudo", "mv", tmpFile, fmt.Sprintf("/etc/nginx/sites-available/%s", domain)}},
-		{"Aktifkan symlink ke sites-enabled", []string{"sudo", "ln", "-sf", fmt.Sprintf("/etc/nginx/sites-available/%s", domain), fmt.Sprintf("/etc/nginx/sites-enabled/%s", domain)}},
-		{"Validasi syntax Nginx", []string{"sudo", "nginx", "-t"}},
-		{"Reload service Nginx", []string{"sudo", "systemctl", "reload", "nginx"}},
+		{"Move config to sites-available", []string{"sudo", "mv", tmpFile, fmt.Sprintf("/etc/nginx/sites-available/%s", domain)}},
+		{"Enable symlink to sites-enabled", []string{"sudo", "ln", "-sf", fmt.Sprintf("/etc/nginx/sites-available/%s", domain), fmt.Sprintf("/etc/nginx/sites-enabled/%s", domain)}},
+		{"Validate Nginx syntax", []string{"sudo", "nginx", "-t"}},
+		{"Reload Nginx service", []string{"sudo", "systemctl", "reload", "nginx"}},
 	}
 
 	for i, step := range steps {
@@ -53,11 +53,11 @@ func SetupNginx(domain string, port string) error {
 		cmd := exec.Command(step.Command[0], step.Command[1:]...)
 		output, err := cmd.CombinedOutput()
 		if err != nil {
-			fmt.Printf("❌ Gagal di tahap: %s\nDetail: %s\n", step.Name, string(output))
+			fmt.Printf("❌ Failed at stage: %s\nDetail: %s\n", step.Name, string(output))
 			return err
 		}
 	}
 
-	fmt.Printf("✅ Nginx untuk %s sudah aktif dan berjalan sempurna!\n", domain)
+	fmt.Printf("✅ Nginx for %s is now active and running perfectly!\n", domain)
 	return nil
 }

@@ -4,13 +4,13 @@
 [![Node Version](https://img.shields.io/badge/Node-18+-green.svg)](https://nodejs.org)
 [![Nginx](https://img.shields.io/badge/Nginx-Automated-brightgreen.svg)](#)
 
-GoNode is a high-performance orchestration engine that manages Node.js applications and automates Nginx reverse proxy configurations
+GoNode is a high-performance orchestration engine that manages Node.js applications and automates Nginx reverse proxy configurations.
 
 ---
 
 ## 📐 Application Flow
 
-GoNode sits between your OS and your Application, acting as the supervisor that even talks to Nginx for you
+GoNode sits between your OS and your Application, acting as the supervisor that even automates Nginx for you.
 
 ```mermaid
 graph TD
@@ -33,7 +33,7 @@ graph TD
 
 ## ✨ Features
 
-- **Nginx Automation**: Automatically generate Nginx reverse proxy configs for your domains
+- **Nginx Automation**: Automatically generate and apply Nginx reverse proxy configs for your domains
 - **DNS Propagation Check**: Use `gonode check propagation` to verify if your domain points to your IP
 - **Smart AI Detection**: **Smart Scan** identifies if your app is Frontend (Next.js/React) or Backend
 - **Adaptive Profiles**: Select hardware-optimized specs (Eco, Balanced, Power)
@@ -49,7 +49,7 @@ GoNode/
 ├── cmd/
 │   └── gonode/        # CLI Entry Point (main.go)
 ├── pkg/
-│   ├── engine/        # cli, daemon, detector, nginx logic
+│   ├── engine/        # Logic: cli, daemon, detector, nginx
 │   ├── logger/        # Logging & Rotation
 │   └── utils/         # UI & Installer
 ├── docs/              # PRD & Documentation
@@ -82,11 +82,6 @@ gonode start
 2. Select **App Type** (use Smart Scan)
 3. Confirm Launch
 4. Select **Yes** for **Nginx Setup** and follow the prompts
-
-### 3. Monitoring
-```bash
-./gonode list
-```
 
 ---
 
