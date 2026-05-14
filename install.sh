@@ -22,7 +22,7 @@ fi
 
 # 3. Build the binary
 echo -e "${YELLOW}📦 Building GoNode binary...${NC}"
-go build -o gonode main.go
+go build -o gonode cmd/gonode/main.go
 
 if [ $? -eq 0 ]; then
     chmod +x gonode

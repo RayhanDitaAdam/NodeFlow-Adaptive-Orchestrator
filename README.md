@@ -45,11 +45,14 @@ graph TD
 
 ```text
 GoNode/
-├── main.go            # CLI Entry Point
+├── cmd/
+│   └── gonode/        # CLI Entry Point (main.go)
 ├── pkg/
 │   ├── engine/        # cli, daemon, detector, nginx logic
 │   ├── logger/        # Logging & Rotation
 │   └── utils/         # UI & Installer
+├── docs/              # PRD & Documentation
+├── examples/          # Example Node.js App
 ├── setup.sh           # Environment Setup (Go, Node, Nginx)
 └── install.sh         # Binary Builder
 ```
@@ -63,9 +66,10 @@ GoNode/
 ./setup.sh
 ```
 
-### 2. Launch & Configure
+### 2. Build & Launch
 ```bash
-go run main.go start
+./install.sh
+./gonode start
 ```
 1. Select **RAM Profile**.
 2. Select **App Type** (use Smart Scan).
