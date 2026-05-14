@@ -1,9 +1,12 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/RayhanDitaAdam/NodeFlow-Adaptive-Orchestrator/main/Logo.png" width="200" alt="GoNode Logo">
+</p>
+
 # GoNode Adaptive Infrastructure Engine 🚀
 
 **GoNode** adalah *infrastructure-as-code orchestrator* berbasis Golang yang dirancang khusus untuk menjalankan aplikasi Node.js tanpa ketergantungan pada Nginx. Cukup satu binary untuk mengatur segalanya: mulai dari *reverse proxy*, manajemen proses, hingga optimasi sumber daya otomatis.
 
 ---
-## Flow Cara Kerja GoNode
 
 ## 🧐 Kenapa Harus Pakai GoNode?
 
@@ -27,24 +30,29 @@ Biasanya, kalau kita mau *deploy* aplikasi Node.js (MERN/Next.js) ke VPS, kita h
 
 ---
 
-## 📑 Studi Kasus: Masalah vs Solusi
+## 📐 Flow Cara Kerja GoNode
 
-### 1. Masalah: "VPS Murah (Shared RAM) Sering Crash"
-* **Kondisi:** Lu punya VPS 512MB RAM. Pas lu jalanin Nginx + PM2 + Node.js, RAM sudah termakan banyak sebelum ada trafik. Begitu trafik naik, sistem langsung *OOM (Out Of Memory) Kill*.
-* **Solusi GoNode:** Pilih profil **"Eco/Low Spec"**. GoNode akan mematikan fitur yang tidak perlu, membatasi *buffer size*, dan mengoptimalkan penggunaan memori agar Node.js punya ruang napas lebih lega di RAM yang terbatas.
+Berikut adalah visualisasi alur kerja bagaimana GoNode mengelola infrastruktur aplikasi lu:
 
-### 2. Masalah: "Ribet Mindahin Project ke Server Baru"
-* **Kondisi:** Harus pindah VPS tapi malas install ulang Nginx, mengatur konfigurasi yang sama, dan melakukan *symlink* ulang yang rawan *human error*.
-* **Solusi GoNode:** Lu cukup *copy* folder proyek dan binary `gonode`. Jalankan di VPS mana pun (Ubuntu/Debian/CentOS), pilih spek, dan web langsung *live* di port 80/443. *Zero dependencies.*
+<p align="center">
+  <img src="https://raw.githubusercontent.com/RayhanDitaAdam/NodeFlow-Adaptive-Orchestrator/main/WorkFlow%20GoNode.png" width="800" alt="GoNode Workflow">
+</p>
 
-### 3. Masalah: "Aplikasi Mati Pas Tengah Malem"
-* **Kondisi:** Ada *logic error* di kode Node.js yang bikin aplikasi *exit* tiba-tiba saat lu lagi tidur.
-* **Solusi GoNode:** Sebagai *parent process*, GoNode akan mendeteksi kematian proses Node.js secara *real-time*, melakukan *respawn* otomatis, dan menjaga layanan tetap bisa diakses tanpa campur tangan manual.
+### High-Level Architecture (Mermaid)
+```mermaid
+graph TD
+    User((🌐 Internet/User)) -->|Port 80/443| GoNode[("🚀 GoNode Engine")]
+    
+    subgraph "Internal Infrastructure"
+    GoNode -->|1. Profiling| Spec[Selection: Eco / Balanced / Power]
+    GoNode -->|2. Process Mgmt| NodeApp["📦 Node.js Instance"]
+    GoNode -->|3. Reverse Proxy| NodeApp
+    end
 
----
+    subgraph "Health Check & Recovery"
+    NodeApp -.->|Exit Code| Monitor{Monitor}
+    Monitor -->|Auto-Restart| NodeApp
+    end
 
-## 🚀 Cara Menjalankan
-
-1. **Build Project**
-   ```bash
-   go build -o gonode
+    style GoNode fill:#00ADD8,stroke:#333,stroke-width:2px,color:#fff
+    style NodeApp fill:#339933,stroke:#333,stroke-width:2px,color:#fff
