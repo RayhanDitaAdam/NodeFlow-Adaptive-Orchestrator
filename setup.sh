@@ -35,6 +35,17 @@ show_footer() {
 }
 
 # --- Helper Functions ---
+check_dependencies() {
+    local missing=0
+    for cmd in go node npm nginx; do
+        if ! command -v $cmd &> /dev/null; then
+            missing=1
+            break
+        fi
+    done
+    return $missing
+}
+
 log_step() { echo -e "\n${BLUE}[$1] $2...${NC}"; }
 log_info() { echo -e "${YELLOW}💡 $1${NC}"; }
 log_error() { echo -e "${RED}❌ $1${NC}"; }
@@ -74,11 +85,17 @@ start_setup() {
 
     case $choice in
         1|2)
-            run_system_update
-            if run_package_installation; then
+            if check_dependencies; then
+                log_success "Golang, Node.js, and Nginx are already installed!"
+                log_info "Skipping installation steps..."
                 show_footer
             else
-                exit 1
+                run_system_update
+                if run_package_installation; then
+                    show_footer
+                else
+                    exit 1
+                fi
             fi
             ;;
         3)
