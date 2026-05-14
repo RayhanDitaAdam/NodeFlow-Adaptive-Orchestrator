@@ -34,6 +34,7 @@ graph TD
 ## ✨ Features
 
 - **Nginx Automation**: Automatically generate Nginx reverse proxy configs for your domains
+- **DNS Propagation Check**: Use `gonode check propagation` to verify if your domain points to your IP
 - **Smart AI Detection**: **Smart Scan** identifies if your app is Frontend (Next.js/React) or Backend
 - **Adaptive Profiles**: Select hardware-optimized specs (Eco, Balanced, Power)
 - **Daemon Mode**: Runs in the background, detached from your terminal
