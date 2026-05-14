@@ -57,9 +57,10 @@ func HandleStartCommand() {
 		fmt.Printf("Success! AI Suggestion: Use %s mode with Entry Point: %s\n", startCmd, entryPoint)
 	case "Backend (API/Node.js)":
 		entryPoint = FindBackendEntry()
+		startCmd = "node"
 	default:
 		entryPoint = "package.json"
-		startCmd = "npm"
+		startCmd = "npm start"
 	}
 
 	// 3. Last Confirmation
