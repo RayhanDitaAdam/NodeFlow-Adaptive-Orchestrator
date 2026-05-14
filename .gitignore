@@ -1,5 +1,5 @@
 # Binaries
-gonode
+/gonode
 *.exe
 *.exe~
 *.dll
