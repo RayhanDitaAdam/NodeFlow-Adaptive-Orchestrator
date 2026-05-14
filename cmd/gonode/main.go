@@ -24,7 +24,11 @@ func main() {
 	case "stop":
 		engine.SendCommand("stop")
 	case "help":
-		utils.PrintHelp()
+		if len(os.Args) > 2 && os.Args[2] == "nginx" {
+			utils.PrintNginxHelp()
+		} else {
+			utils.PrintHelp()
+		}
 	case "daemon-logic":
 		engine.RunDaemonLogic()
 	default:
