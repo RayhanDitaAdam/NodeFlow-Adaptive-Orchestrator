@@ -42,7 +42,7 @@ func HandleStartCommand() {
 	appType := ""
 	if err := survey.AskOne(&survey.Select{
 		Message: "2. Application Type:",
-		Options: []string{"Backend (API/Node.js)", "Frontend (Next.js/React)", "Smart Scan (AI Detect)"},
+		Options: []string{"Smart Scan (AI Detect) [Recommended]", "Backend (API/Node.js)", "Frontend (Next.js/React)"},
 	}, &appType); err != nil {
 		log.Fatal(err)
 	}
@@ -52,7 +52,7 @@ func HandleStartCommand() {
 	detectedPort := "3000"
 	
 	switch appType {
-	case "Smart Scan (AI Detect)":
+	case "Smart Scan (AI Detect) [Recommended]":
 		fmt.Println("AI Orchestrator: Analyzing project structure...")
 		entryPoint, startCmd, detectedPort = SmartDetect()
 		fmt.Printf("Success! AI Suggestion: Use %s mode with Entry Point: %s (Detected Port: %s)\n", startCmd, entryPoint, detectedPort)
