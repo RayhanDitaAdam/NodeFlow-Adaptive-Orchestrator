@@ -154,6 +154,8 @@ func launchDaemon(config ServerProfile, entryPoint string, startCmd string) {
 	}
 
 	fmt.Printf("\nGoNode [%s] launched to background! Use 'gonode list' to monitor.\n", config.Name)
+	fmt.Println("Note: If this is the first run, GoNode is currently running 'npm install' & 'build' in the background.")
+	fmt.Println("Check 'gonode.log' for build progress.")
 }
 
 func SendCommand(cmd string) {

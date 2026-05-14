@@ -27,12 +27,32 @@ func RunDaemonLogic() {
 	startCmdStr := os.Getenv("GO_NODE_CMD")
 	startTime := time.Now()
 
+	logFile, _ := os.OpenFile("gonode.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	fmt.Fprintf(logFile, "\n[%s] [SYSTEM] GoNode Engine Starting...\n", time.Now().Format("2006-01-02 15:04:05"))
+
+	// 1. Dependency Check (Auto-Install)
+	if _, err := os.Stat("node_modules"); os.IsNotExist(err) {
+		fmt.Fprintf(logFile, "[%s] [SYSTEM] node_modules not found. Running npm install...\n", time.Now().Format("2006-01-02 15:04:05"))
+		installCmd := exec.Command("npm", "install")
+		installCmd.Stdout = logFile
+		installCmd.Stderr = logFile
+		installCmd.Run()
+	}
+
+	// 2. Build Check (For Frontend Apps)
+	if startCmdStr == "npm" {
+		fmt.Fprintf(logFile, "[%s] [SYSTEM] Frontend detected. Running npm run build...\n", time.Now().Format("2006-01-02 15:04:05"))
+		buildCmd := exec.Command("npm", "run", "build")
+		buildCmd.Stdout = logFile
+		buildCmd.Stderr = logFile
+		buildCmd.Run()
+	}
+
+	// 3. Spawning Main Process
 	var nodeCmd *exec.Cmd
 	if startCmdStr == "npm" {
-		// For Frontend (Next.js/React)
 		nodeCmd = exec.Command("npm", "start")
 	} else {
-		// For Backend (Node.js)
 		nodeCmd = exec.Command("node", fmt.Sprintf("--max-old-space-size=%s", mem), entry)
 	}
 
@@ -41,15 +61,15 @@ func RunDaemonLogic() {
 		"GONODE_WORKERS="+workers,
 	)
 	
-	logFile, _ := os.OpenFile("gonode.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	
 	stdoutPipe, _ := nodeCmd.StdoutPipe()
 	stderrPipe, _ := nodeCmd.StderrPipe()
 
 	if err := nodeCmd.Start(); err != nil {
-		fmt.Fprintf(logFile, "[%s] [SYSTEM] Failed to start process: %v\n", time.Now().Format("2006-01-02 15:04:05"), err)
+		fmt.Fprintf(logFile, "[%s] [SYSTEM] Failed to launch main process: %v\n", time.Now().Format("2006-01-02 15:04:05"), err)
 		return
 	}
+
+	fmt.Fprintf(logFile, "[%s] [SYSTEM] App launched successfully!\n", time.Now().Format("2006-01-02 15:04:05"))
 
 	go logger.ProcessLog(stdoutPipe, "[INFO]", logFile)
 	go logger.ProcessLog(stderrPipe, "[ERROR]", logFile)
@@ -66,7 +86,7 @@ func RunDaemonLogic() {
 			req := scanner.Text()
 			switch req {
 			case "list":
-				res := fmt.Sprintf("App: %s | Profile: %s | Workers: %s | Uptime: %s\n", entry, name, workers, time.Since(startTime).Round(time.Second))
+				res := fmt.Sprintf("App: %s | Profile: %s | Status: Running | Uptime: %s\n", entry, name, time.Since(startTime).Round(time.Second))
 				conn.Write([]byte(res))
 			case "stop":
 				conn.Write([]byte("Stopping GoNode Engine...\n"))
