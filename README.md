@@ -12,14 +12,14 @@ GoNode is a high-performance orchestration engine that manages Node.js applicati
 
 ```mermaid
 graph TD
-    User((External Traffic)) -->|Port 80| Nginx[("Nginx Gateway")]
+    User((External Traffic)) <-->|Port 80| Nginx[("Nginx Gateway")]
     
     subgraph "GoNode Control Plane"
-    CLI[("CLI User")] -->|1. Profiling| Engine
-    Engine[("GoNode Engine")] -->|2. Smart Scan| Detector{Frontend / Backend}
-    Engine -->|3. Network Check| Net[Public IP / DNS Check]
+    CLI[("CLI User")] <-->|1. Interactive| Engine
+    Engine[("GoNode Engine")] <-->|2. Smart Scan| Detector{Frontend / Backend}
+    Engine <-->|3. Network Check| Net[Public IP / DNS Check]
     Engine -->|4. Automation| Nginx
-    Engine -->|5. Orchestrate| NodeApp["Managed App"]
+    Engine <-->|5. Orchestrate| NodeApp["Managed App"]
     end
 
     subgraph "Intelligent Infrastructure"
@@ -28,7 +28,7 @@ graph TD
     Logger -->|Rotation| LogFile["gonode.log (1MB Limit)"]
     end
 
-    Nginx -->|Proxy Pass| NodeApp
+    Nginx <-->|Proxy Pass| NodeApp
 ```
 
 ---
