@@ -110,9 +110,9 @@ func getPublicIP() string {
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
-	resp, err := client.Get("https://ifconfig.me")
+	// api.ipify.org is more reliable for plain text IP
+	resp, err := client.Get("https://api.ipify.org")
 	if err != nil {
-		// Fallback to local IP if public check fails
 		return getLocalIP()
 	}
 	defer resp.Body.Close()

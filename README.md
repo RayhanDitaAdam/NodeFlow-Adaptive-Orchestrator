@@ -4,7 +4,7 @@
 [![Node Version](https://img.shields.io/badge/Node-18+-green.svg)](https://nodejs.org)
 [![Nginx](https://img.shields.io/badge/Nginx-Automated-brightgreen.svg)](#)
 
-GoNode is a high-performance orchestration engine that manages Node.js applications and automates Nginx reverse proxy configurations with intelligent profiling
+An automated orchestration engine for Node.js designed to eliminate manual Nginx configurations. It acts as an intelligent entry-point that dynamically allocates system resources based on adaptive hardware profiles through an interactive CLI
 
 ---
 
