@@ -10,39 +10,39 @@ type PackageJSON struct {
 	Scripts map[string]string `json:"scripts"`
 }
 
-// SmartDetect analyzes the project to find the best start command and entry point
-func SmartDetect() (string, string) {
+// SmartDetect analyzes the project to find the best start command, entry point, and default port
+func SmartDetect() (string, string, string) {
 	data, err := os.ReadFile("package.json")
 	if err != nil {
-		return "app.js", "node"
+		return "app.js", "node", "3000"
 	}
 
 	content := string(data)
 	var pkg PackageJSON
 	json.Unmarshal(data, &pkg)
 
-	// 1. Check for Vite (Very common for modern React apps)
+	// 1. Check for Vite
 	if strings.Contains(content, "vite") {
 		if _, ok := pkg.Scripts["preview"]; ok {
-			return "vite-project", "npm run preview"
+			return "vite-project", "npm run preview", "4173"
 		}
 		if _, ok := pkg.Scripts["dev"]; ok {
-			return "vite-project (dev)", "npm run dev"
+			return "vite-project (dev)", "npm run dev", "5173"
 		}
 	}
 
 	// 2. Check for Next.js
 	if strings.Contains(content, "\"next\"") {
-		return "Next.js App", "npm start"
+		return "Next.js App", "npm start", "3000"
 	}
 
 	// 3. Check for standard NPM start
 	if _, ok := pkg.Scripts["start"]; ok {
-		return "Node.js (NPM)", "npm start"
+		return "Node.js (NPM)", "npm start", "3000"
 	}
 
-	// 4. Fallback to direct Node
-	return "main.js", "node"
+	// 4. Fallback
+	return "main.js", "node", "3000"
 }
 
 // FindBackendEntry looks for common entry files

@@ -49,12 +49,13 @@ func HandleStartCommand() {
 
 	entryPoint := ""
 	startCmd := "node"
+	detectedPort := "3000"
 	
 	switch appType {
 	case "Smart Scan (AI Detect)":
 		fmt.Println("AI Orchestrator: Analyzing project structure...")
-		entryPoint, startCmd = SmartDetect()
-		fmt.Printf("Success! AI Suggestion: Use %s mode with Entry Point: %s\n", startCmd, entryPoint)
+		entryPoint, startCmd, detectedPort = SmartDetect()
+		fmt.Printf("Success! AI Suggestion: Use %s mode with Entry Point: %s (Detected Port: %s)\n", startCmd, entryPoint, detectedPort)
 	case "Backend (API/Node.js)":
 		entryPoint = FindBackendEntry()
 		startCmd = "node"
@@ -90,7 +91,7 @@ func HandleStartCommand() {
 		}, &exposureType)
 
 		domainOrIP := ""
-		port := "3000"
+		port := detectedPort
 		
 		if exposureType == "Public (Domain Name)" {
 			survey.AskOne(&survey.Input{Message: "Enter Domain (e.g., myapp.com):"}, &domainOrIP)
@@ -101,7 +102,7 @@ func HandleStartCommand() {
 			fmt.Println("Note: Ensure Port 80 is open in your Cloud/Firewall settings.")
 		}
 		
-		survey.AskOne(&survey.Input{Message: "Enter App Port (default 3000):", Default: "3000"}, &port)
+		survey.AskOne(&survey.Input{Message: "Enter App Port (default " + detectedPort + "):", Default: detectedPort}, &port)
 		
 		if domainOrIP != "" {
 			SetupNginx(domainOrIP, port)
@@ -158,6 +159,8 @@ func launchDaemon(config ServerProfile, entryPoint string, startCmd string, proj
 
 	fmt.Printf("\nGoNode [%s] launched to background! Use 'gonode list' to monitor.\n", projectName)
 	fmt.Printf("To view logs, run: gonode logs %s\n", projectName)
+	fmt.Println("Note: If this is the first run, GoNode is currently running 'npm install' & 'build' in the background.")
+	fmt.Println("Check the logs for build progress.")
 }
 
 func SendCommand(cmd string) {
