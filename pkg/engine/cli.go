@@ -3,11 +3,15 @@ package engine
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 	"syscall"
+	"time"
 
 	"github.com/AlecAivazis/survey/v2"
 )
@@ -86,8 +90,10 @@ func HandleStartCommand() {
 		if exposureType == "Public (Domain Name)" {
 			survey.AskOne(&survey.Input{Message: "Enter Domain (e.g., myapp.com):"}, &domainOrIP)
 		} else {
-			domainOrIP = getLocalIP()
-			fmt.Printf("AI Orchestrator: Detected Local IP: %s\n", domainOrIP)
+			fmt.Println("AI Orchestrator: Fetching Server IP...")
+			domainOrIP = getPublicIP()
+			fmt.Printf("AI Orchestrator: Use this IP to access your app: %s\n", domainOrIP)
+			fmt.Println("Note: Ensure Port 80 is open in your Cloud/Firewall settings.")
 		}
 		
 		survey.AskOne(&survey.Input{Message: "Enter App Port (default 3000):", Default: "3000"}, &port)
@@ -98,6 +104,20 @@ func HandleStartCommand() {
 	}
 
 	launchDaemon(profiles[selectedProfile], entryPoint, startCmd)
+}
+
+func getPublicIP() string {
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	resp, err := client.Get("https://ifconfig.me")
+	if err != nil {
+		// Fallback to local IP if public check fails
+		return getLocalIP()
+	}
+	defer resp.Body.Close()
+	body, _ := io.ReadAll(resp.Body)
+	return strings.TrimSpace(string(body))
 }
 
 func getLocalIP() string {
