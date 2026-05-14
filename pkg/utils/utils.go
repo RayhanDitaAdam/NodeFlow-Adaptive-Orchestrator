@@ -2,10 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 )
-
 
 // PrintHelp displays guidance for the user
 func PrintHelp() {

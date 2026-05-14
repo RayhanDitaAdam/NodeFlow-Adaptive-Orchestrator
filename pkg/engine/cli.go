@@ -42,13 +42,14 @@ func HandleStartCommand() {
 	entryPoint := ""
 	startCmd := "node"
 	
-	if appType == "Smart Scan (AI Detect)" {
+	switch appType {
+	case "Smart Scan (AI Detect)":
 		fmt.Println("🤖 AI sedang menganalisa folder project ente...")
 		entryPoint, startCmd = SmartDetect()
 		fmt.Printf("✅ AI Menyarankan: Mode %s dengan Entry Point: %s\n", startCmd, entryPoint)
-	} else if appType == "Backend (API/Node.js)" {
+	case "Backend (API/Node.js)":
 		entryPoint = FindBackendEntry()
-	} else {
+	default:
 		entryPoint = "package.json"
 		startCmd = "npm"
 	}
