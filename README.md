@@ -107,6 +107,7 @@ gonode list
 To maintain code quality and stability, we follow a branching model:
 
 - **`main`**: Production-ready code. Only stable releases should be here.
+- **`staging`**: Pre-production environment for final testing and QA before releasing to `main`.
 - **`development`**: Integration branch for new features and bug fixes.
 - **`feature/*`**: Temporary branches for developing specific features.
 
