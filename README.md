@@ -1,10 +1,14 @@
+<p align="center">
+  <img src="Logo.png" alt="GoNode Logo" width="200"/>
+</p>
+
 # GoNode - Adaptive Infrastructure Engine
 
 [![Go Version](https://img.shields.io/badge/Go-1.23-blue.svg)](https://golang.org)
 [![Node Version](https://img.shields.io/badge/Node-18+-green.svg)](https://nodejs.org)
 [![Nginx](https://img.shields.io/badge/Nginx-Automated-brightgreen.svg)](#)
 
-An automated orchestration engine for Node.js designed to eliminate manual Nginx configurations. It acts as an intelligent entry-point that dynamically allocates system resources based on adaptive hardware profiles through an interactive CLI
+An automated orchestration engine for Node.js designed to eliminate manual Nginx configurations. It acts as an intelligent entry-point that dynamically allocates system resources based on adaptive hardware profiles through an interactive CLI.
 
 ---
 
