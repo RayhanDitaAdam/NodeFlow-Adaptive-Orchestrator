@@ -136,6 +136,7 @@ func HandleStartCommand() {
 				return
 			}
 		}
+	}
 	if setupNginxPrompt && domainOrIP != "" {
 		SetupNginx(domainOrIP, port)
 
