@@ -251,6 +251,7 @@ func ListAllServices() {
 		if err != nil {
 			continue
 		}
+		conn.SetReadDeadline(time.Now().Add(1 * time.Second))
 
 		fmt.Fprintln(conn, "list")
 		scanner := bufio.NewScanner(conn)
@@ -275,6 +276,7 @@ func CheckPortConflict(targetPort string) string {
 		if err != nil {
 			continue
 		}
+		conn.SetReadDeadline(time.Now().Add(1 * time.Second))
 
 		fmt.Fprintln(conn, "info")
 		scanner := bufio.NewScanner(conn)
@@ -302,6 +304,7 @@ func SendCommandTo(projectName string, cmd string) {
 		return
 	}
 	defer conn.Close()
+	conn.SetReadDeadline(time.Now().Add(2 * time.Second))
 
 	fmt.Fprintln(conn, cmd)
 	scanner := bufio.NewScanner(conn)

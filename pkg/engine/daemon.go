@@ -92,7 +92,7 @@ func RunDaemonLogic() {
 		}
 
 		scanner := bufio.NewScanner(conn)
-		for scanner.Scan() {
+		if scanner.Scan() {
 			req := scanner.Text()
 			switch req {
 			case "list":
