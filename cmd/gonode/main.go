@@ -27,7 +27,7 @@ func main() {
 			fmt.Println("Usage: gonode check propagation <domain> <expected_ip>")
 		}
 	case "list":
-		engine.SendCommand("list")
+		engine.ListAllServices()
 	case "logs":
 		if len(os.Args) < 3 {
 			fmt.Println("Usage: gonode logs <project-name>")
@@ -35,7 +35,11 @@ func main() {
 		}
 		utils.TailLogs(os.Args[2])
 	case "stop":
-		engine.SendCommand("stop")
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: gonode stop <project-name>")
+			return
+		}
+		engine.SendCommandTo(os.Args[2], "stop")
 	case "help":
 		if len(os.Args) > 2 && os.Args[2] == "nginx" {
 			utils.PrintNginxHelp()

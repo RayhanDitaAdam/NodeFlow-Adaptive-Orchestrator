@@ -13,13 +13,6 @@ import (
 )
 
 func RunDaemonLogic() {
-	os.Remove(SOCKET_FILE)
-	l, err := net.Listen("unix", SOCKET_FILE)
-	if err != nil {
-		return
-	}
-	defer l.Close()
-
 	projectName := os.Getenv("GO_NODE_PROJECT_NAME")
 	profileName := os.Getenv("GO_NODE_NAME")
 	mem := os.Getenv("GO_NODE_MEM")
@@ -29,6 +22,14 @@ func RunDaemonLogic() {
 	startCmdStr := os.Getenv("GO_NODE_CMD")
 	startTime := time.Now()
 
+	socketPath := GetSocketPath(projectName)
+	os.Remove(socketPath)
+	l, err := net.Listen("unix", socketPath)
+	if err != nil {
+		return
+	}
+	defer l.Close()
+
 	logFileName := fmt.Sprintf("%s.log", projectName)
 	logFile, _ := os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	fmt.Fprintf(logFile, "\n[%s] [SYSTEM] GoNode Engine Starting for Project: %s...\n", time.Now().Format("2006-01-02 15:04:05"), projectName)
@@ -36,7 +37,10 @@ func RunDaemonLogic() {
 	// 1. Dependency Check
 	if _, err := os.Stat("node_modules"); os.IsNotExist(err) {
 		fmt.Fprintf(logFile, "[%s] [SYSTEM] node_modules not found. Running npm install...\n", time.Now().Format("2006-01-02 15:04:05"))
-		exec.Command("npm", "install").Run()
+		installCmd := exec.Command("npm", "install")
+		installCmd.Stdout = logFile
+		installCmd.Stderr = logFile
+		installCmd.Run()
 	}
 
 	// 2. Build Check
@@ -57,11 +61,11 @@ func RunDaemonLogic() {
 		nodeCmd = exec.Command("node", fmt.Sprintf("--max-old-space-size=%s", mem), entry)
 	}
 
-	nodeCmd.Env = append(os.Environ(), 
-		"NODE_ENV="+env, 
+	nodeCmd.Env = append(os.Environ(),
+		"NODE_ENV="+env,
 		"GONODE_WORKERS="+workers,
 	)
-	
+
 	stdoutPipe, _ := nodeCmd.StdoutPipe()
 	stderrPipe, _ := nodeCmd.StderrPipe()
 
@@ -90,9 +94,9 @@ func RunDaemonLogic() {
 				res := fmt.Sprintf("Project: %s | Profile: %s | Status: Running | Uptime: %s\n", projectName, profileName, time.Since(startTime).Round(time.Second))
 				conn.Write([]byte(res))
 			case "stop":
-				conn.Write([]byte(fmt.Sprintf("Stopping GoNode Engine for %s...\n", projectName)))
+				conn.Write([]byte(fmt.Sprintf("Stopping %s...\n", projectName)))
 				nodeCmd.Process.Kill()
-				os.Remove(SOCKET_FILE)
+				os.Remove(socketPath)
 				os.Exit(0)
 			}
 		}

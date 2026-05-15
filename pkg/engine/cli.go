@@ -168,10 +168,39 @@ func launchDaemon(config ServerProfile, entryPoint string, startCmd string, proj
 	fmt.Printf("Logs: gonode logs %s\n", projectName)
 }
 
-func SendCommand(cmd string) {
-	conn, err := net.Dial("unix", SOCKET_FILE)
+// ListAllServices queries all running GoNode daemons and prints their status
+func ListAllServices() {
+	projects := GetAllSockets()
+	if len(projects) == 0 {
+		fmt.Println("No running services found.")
+		return
+	}
+
+	fmt.Printf("%-20s %-12s %-10s %s\n", "PROJECT", "PROFILE", "STATUS", "UPTIME")
+	fmt.Println(strings.Repeat("-", 60))
+
+	for _, project := range projects {
+		socketPath := GetSocketPath(project)
+		conn, err := net.DialTimeout("unix", socketPath, 2*time.Second)
+		if err != nil {
+			continue
+		}
+
+		fmt.Fprintln(conn, "list")
+		scanner := bufio.NewScanner(conn)
+		for scanner.Scan() {
+			fmt.Println(scanner.Text())
+		}
+		conn.Close()
+	}
+}
+
+// SendCommandTo sends a command to a specific project's daemon
+func SendCommandTo(projectName string, cmd string) {
+	socketPath := GetSocketPath(projectName)
+	conn, err := net.DialTimeout("unix", socketPath, 2*time.Second)
 	if err != nil {
-		fmt.Println("Error: GoNode Daemon not found.")
+		fmt.Printf("Error: Service '%s' not found or not running.\n", projectName)
 		return
 	}
 	defer conn.Close()
