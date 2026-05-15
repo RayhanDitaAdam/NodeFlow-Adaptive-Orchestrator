@@ -278,8 +278,8 @@ func ListAllServices() {
 		return
 	}
 
-	fmt.Printf("%-20s %-12s %-10s %s\n", "PROJECT", "PROFILE", "STATUS", "UPTIME")
-	fmt.Println(strings.Repeat("-", 60))
+	fmt.Printf("%-20s %-12s %-10s %-10s %s\n", "PROJECT", "PROFILE", "STATUS", "UPTIME", "ACCESS")
+	fmt.Println(strings.Repeat("-", 80))
 
 	for _, project := range projects {
 		socketPath := GetSocketPath(project)
@@ -293,8 +293,12 @@ func ListAllServices() {
 		scanner := bufio.NewScanner(conn)
 		for scanner.Scan() {
 			parts := strings.Split(scanner.Text(), "|")
-			if len(parts) == 4 {
-				fmt.Printf("%-20s %-12s %-10s %s\n", parts[0], parts[1], parts[2], parts[3])
+			if len(parts) >= 4 {
+				access := "-"
+				if len(parts) == 5 && parts[4] != "" {
+					access = parts[4]
+				}
+				fmt.Printf("%-20s %-12s %-10s %-10s %s\n", parts[0], parts[1], parts[2], parts[3], access)
 			} else {
 				fmt.Println(scanner.Text())
 			}

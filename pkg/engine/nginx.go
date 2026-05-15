@@ -102,8 +102,11 @@ func SetupSSL(domain string, email string) error {
 	}
 	fmt.Printf("\r[1/2] Obtaining SSL certificate... Success!\n")
 
-	fmt.Println("[2/2] Verifying SSL renewal...")
+	stopRenew := make(chan bool)
+	utils.ShowLoading(stopRenew, "[2/2] Verifying SSL renewal...")
 	exec.Command("sudo", "certbot", "renew", "--dry-run").Run()
+	stopRenew <- true
+	fmt.Printf("\r[2/2] Verifying SSL renewal... Success!\n")
 
 	fmt.Printf("SSL for %s is active. Your site is now served over HTTPS.\n", domain)
 	return nil

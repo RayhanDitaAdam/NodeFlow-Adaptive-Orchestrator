@@ -97,7 +97,7 @@ func RunDaemonLogic() {
 			req := scanner.Text()
 			switch req {
 			case "list":
-				res := fmt.Sprintf("%s|%s|Running|%s\n", projectName, profileName, time.Since(startTime).Round(time.Second))
+				res := fmt.Sprintf("%s|%s|Running|%s|%s\n", projectName, profileName, time.Since(startTime).Round(time.Second), domain)
 				conn.Write([]byte(res))
 			case "info":
 				res := fmt.Sprintf("domain=%s\nport=%s\n", domain, port)
