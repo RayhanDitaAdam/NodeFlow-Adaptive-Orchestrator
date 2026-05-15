@@ -69,6 +69,7 @@ func RunDaemonLogic() {
 	nodeCmd.Env = append(os.Environ(),
 		"NODE_ENV="+env,
 		"GONODE_WORKERS="+workers,
+		"PORT="+port,
 	)
 
 	stdoutPipe, _ := nodeCmd.StdoutPipe()
