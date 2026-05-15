@@ -59,3 +59,41 @@ func SetupNginx(domain string, port string) error {
 	fmt.Printf("Nginx for %s is active.\n", domain)
 	return nil
 }
+
+// SetupSSL obtains and configures a Let's Encrypt SSL certificate via Certbot
+func SetupSSL(domain string, email string) error {
+	fmt.Printf("\nConfiguring SSL for %s\n", domain)
+
+	// Check if certbot is installed
+	if _, err := exec.LookPath("certbot"); err != nil {
+		fmt.Println("Certbot not found. Installing...")
+		installCmd := exec.Command("sudo", "apt", "install", "-y", "certbot", "python3-certbot-nginx")
+		installCmd.Stdout = os.Stdout
+		installCmd.Stderr = os.Stderr
+		if err := installCmd.Run(); err != nil {
+			fmt.Println("Error: Failed to install Certbot.")
+			return err
+		}
+	}
+
+	// Run certbot with nginx plugin
+	fmt.Println("[1/2] Obtaining SSL certificate...")
+	certCmd := exec.Command("sudo", "certbot", "--nginx",
+		"-d", domain,
+		"--email", email,
+		"--agree-tos",
+		"--non-interactive",
+		"--redirect",
+	)
+	output, err := certCmd.CombinedOutput()
+	if err != nil {
+		fmt.Printf("Error: SSL setup failed.\n%s\n", string(output))
+		return err
+	}
+
+	fmt.Println("[2/2] Verifying SSL renewal...")
+	exec.Command("sudo", "certbot", "renew", "--dry-run").Run()
+
+	fmt.Printf("SSL for %s is active. Your site is now served over HTTPS.\n", domain)
+	return nil
+}

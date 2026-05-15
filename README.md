@@ -37,6 +37,7 @@ graph TD
 
 - **Smart IP Detection**: Automatically fetches your server's Public IP for instant access without a domain
 - **Nginx Automation**: Automatically generate and apply Nginx configs for Public (Domain) or Local (IP) access
+- **SSL Automation**: One-click Let's Encrypt SSL setup when using a domain (automatically skipped for IP-based access)
 - **DNS Propagation Check**: Integrated tool to verify if your domain points to your server before setup
 - **Smart AI Detection**: Smart Scan identifies if your app is Frontend (Next.js/React) or Backend (Node.js)
 - **Adaptive Profiles**: Select hardware-optimized specs (Eco, Balanced, Power) with one click
@@ -87,6 +88,7 @@ gonode start
 4. Select Yes for Nginx Setup
 5. Choose Exposure Type: Public (Domain) or Local (IP)
 6. GoNode automatically detects your Public IP if Local is selected
+7. If using a domain, GoNode will offer to setup SSL via Let's Encrypt
 
 ### 4. Monitoring
 ```bash

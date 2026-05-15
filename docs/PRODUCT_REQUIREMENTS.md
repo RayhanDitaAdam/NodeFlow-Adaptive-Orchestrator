@@ -22,14 +22,19 @@ GoNode is a high-performance orchestration engine written in Go, designed to man
 - **Exposure Options**: Supports both Public Domain and Local IP setups.
 - **Smart IP Detection**: Automatically fetches the server's Public IP using external providers to ensure external reachability.
 
-### 3.4 DNS Propagation Checker
+### 3.4 SSL Automation (Let's Encrypt)
+- **One-Click HTTPS**: Automatically installs Certbot and obtains SSL certificates when using a domain.
+- **Auto-Redirect**: Configures Nginx to redirect all HTTP traffic to HTTPS.
+- **Renewal Verification**: Validates that auto-renewal is working after certificate installation.
+
+### 3.5 DNS Propagation Checker
 - **Real-time Verification**: Tool to verify if a domain is correctly pointing to the server's IP before proceeding with the setup.
 
-### 3.5 Real-time Log Management
+### 3.6 Real-time Log Management
 - **Automated Rotation**: Truncates logs at 1MB to prevent disk overflow.
 - **Enhanced Observability**: High-precision timestamps for all process outputs.
 
-### 3.6 Global CLI & Control Plane
+### 3.7 Global CLI & Control Plane
 - **Background Daemon**: Fully detached background execution.
 - **Unix Sockets**: High-speed local communication for process control.
 
@@ -40,6 +45,5 @@ GoNode is a high-performance orchestration engine written in Go, designed to man
 - **Communication**: Unix Domain Sockets
 
 ## 5. Roadmap
-- [ ] Automated SSL integration (Let's Encrypt).
 - [ ] Multi-application orchestration in a single daemon.
 - [ ] Web-based monitoring UI.

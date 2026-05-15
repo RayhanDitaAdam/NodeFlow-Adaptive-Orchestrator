@@ -99,6 +99,21 @@ func HandleStartCommand() {
 		
 		if domainOrIP != "" {
 			SetupNginx(domainOrIP, port)
+
+			// SSL only available for domain-based exposure
+			if exposureType == "Public (Domain Name)" {
+				setupSSL := false
+				survey.AskOne(&survey.Confirm{
+					Message: "5. Setup SSL Certificate (Let's Encrypt)?",
+					Default: true,
+				}, &setupSSL)
+
+				if setupSSL {
+					email := ""
+					survey.AskOne(&survey.Input{Message: "Enter email for SSL notifications:", Default: "admin@" + domainOrIP}, &email)
+					SetupSSL(domainOrIP, email)
+				}
+			}
 		}
 	}
 
