@@ -165,7 +165,21 @@ func HandleStartCommand() {
 			if setupSSL {
 				email := ""
 				survey.AskOne(&survey.Input{Message: "Enter email for SSL notifications:", Default: "admin@" + domainOrIP}, &email)
-				SetupSSL(domainOrIP, email)
+				if err := SetupSSL(domainOrIP, email); err != nil {
+					fmt.Println("\n❌ SSL Setup Failed! Your app will only be accessible over HTTP.")
+					fmt.Println("💡 Tip: Ensure Port 80/443 is open in your cloud firewall (Security Groups/UFW).")
+					
+					continueAnyway := false
+					survey.AskOne(&survey.Confirm{
+						Message: "Do you want to continue launching over HTTP?",
+						Default: true,
+					}, &continueAnyway)
+					
+					if !continueAnyway {
+						fmt.Println("Launch aborted.")
+						return
+					}
+				}
 			}
 		}
 	}
