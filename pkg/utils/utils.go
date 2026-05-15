@@ -6,7 +6,27 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
+
+// ShowLoading starts a simple ASCII spinner in a goroutine
+func ShowLoading(stop chan bool, message string) {
+	chars := []string{"|", "/", "-", "\\"}
+	i := 0
+	go func() {
+		for {
+			select {
+			case <-stop:
+				fmt.Print("\r") // Clear the line
+				return
+			default:
+				fmt.Printf("\r%s %s ", chars[i], message)
+				i = (i + 1) % len(chars)
+				time.Sleep(100 * time.Millisecond)
+			}
+		}
+	}()
+}
 
 // PrintHelp displays guidance for the user
 func PrintHelp() {

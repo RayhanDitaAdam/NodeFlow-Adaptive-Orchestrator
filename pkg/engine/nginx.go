@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"gonode/pkg/utils"
 )
 
 // GenerateNginxConfig creates a string containing the Nginx reverse proxy setup
@@ -47,13 +48,18 @@ func SetupNginx(domain string, port string) error {
 	}
 
 	for i, step := range steps {
-		fmt.Printf("[%d/4] %s...\n", i+1, step.Name)
+		stop := make(chan bool)
+		utils.ShowLoading(stop, fmt.Sprintf("[%d/4] %s...", i+1, step.Name))
+		
 		cmd := exec.Command(step.Command[0], step.Command[1:]...)
 		output, err := cmd.CombinedOutput()
+		stop <- true
+		
 		if err != nil {
-			fmt.Printf("Error: %s\n", string(output))
+			fmt.Printf("\rError during %s: %s\n", step.Name, string(output))
 			return err
 		}
+		fmt.Printf("\r[%d/4] %s... Success!\n", i+1, step.Name)
 	}
 
 	fmt.Printf("Nginx for %s is active.\n", domain)
@@ -77,7 +83,9 @@ func SetupSSL(domain string, email string) error {
 	}
 
 	// Run certbot with nginx plugin
-	fmt.Println("[1/2] Obtaining SSL certificate...")
+	stop := make(chan bool)
+	utils.ShowLoading(stop, "[1/2] Obtaining SSL certificate...")
+
 	certCmd := exec.Command("sudo", "certbot", "--nginx",
 		"-d", domain,
 		"--email", email,
@@ -86,10 +94,13 @@ func SetupSSL(domain string, email string) error {
 		"--redirect",
 	)
 	output, err := certCmd.CombinedOutput()
+	stop <- true // Stop the spinner
+
 	if err != nil {
-		fmt.Printf("Error: SSL setup failed.\n%s\n", string(output))
+		fmt.Printf("\rError: SSL setup failed.\n%s\n", string(output))
 		return err
 	}
+	fmt.Printf("\r[1/2] Obtaining SSL certificate... Success!\n")
 
 	fmt.Println("[2/2] Verifying SSL renewal...")
 	exec.Command("sudo", "certbot", "renew", "--dry-run").Run()
