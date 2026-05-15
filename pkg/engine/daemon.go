@@ -22,6 +22,7 @@ func RunDaemonLogic() {
 	entry := os.Getenv("GO_NODE_ENTRY")
 	startCmdStr := os.Getenv("GO_NODE_CMD")
 	domain := os.Getenv("GO_NODE_DOMAIN")
+	port := os.Getenv("GO_NODE_PORT")
 	startTime := time.Now()
 
 	socketPath := GetSocketPath(projectName)
@@ -95,10 +96,10 @@ func RunDaemonLogic() {
 			req := scanner.Text()
 			switch req {
 			case "list":
-				res := fmt.Sprintf("Project: %s | Profile: %s | Status: Running | Uptime: %s\n", projectName, profileName, time.Since(startTime).Round(time.Second))
+				res := fmt.Sprintf("%s|%s|Running|%s\n", projectName, profileName, time.Since(startTime).Round(time.Second))
 				conn.Write([]byte(res))
 			case "info":
-				res := fmt.Sprintf("domain=%s\n", domain)
+				res := fmt.Sprintf("domain=%s\nport=%s\n", domain, port)
 				conn.Write([]byte(res))
 			case "stop":
 				conn.Write([]byte(fmt.Sprintf("Stopping %s...\n", projectName)))
