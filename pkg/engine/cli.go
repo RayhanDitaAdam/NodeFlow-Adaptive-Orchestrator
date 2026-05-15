@@ -16,7 +16,21 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 )
 
+func PrintLogo() {
+	logo := `
+   ______      _   __           __   
+  / ____/___  / | / /___  ____/ /__ 
+ / / __/ __ \/  |/ / __ \/ __  / _ \
+/ /_/ / /_/ / /|  / /_/ / /_/ /  __/
+\____/\____/_/ |_/\____/\__,_/\___/ 
+                                     
+   Adaptive Infrastructure Engine
+`
+	fmt.Println(logo)
+}
+
 func HandleStartCommand() {
+	PrintLogo()
 	projectName := ""
 	survey.AskOne(&survey.Input{Message: "0. Enter Project Name:", Default: "myapp"}, &projectName)
 
