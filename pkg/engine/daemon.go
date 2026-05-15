@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"syscall"
 	"time"
 
 	"gonode/pkg/logger"
@@ -20,6 +21,7 @@ func RunDaemonLogic() {
 	env := os.Getenv("GO_NODE_ENV")
 	entry := os.Getenv("GO_NODE_ENTRY")
 	startCmdStr := os.Getenv("GO_NODE_CMD")
+	domain := os.Getenv("GO_NODE_DOMAIN")
 	startTime := time.Now()
 
 	socketPath := GetSocketPath(projectName)
@@ -61,6 +63,8 @@ func RunDaemonLogic() {
 		nodeCmd = exec.Command("node", fmt.Sprintf("--max-old-space-size=%s", mem), entry)
 	}
 
+	nodeCmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+
 	nodeCmd.Env = append(os.Environ(),
 		"NODE_ENV="+env,
 		"GONODE_WORKERS="+workers,
@@ -93,9 +97,14 @@ func RunDaemonLogic() {
 			case "list":
 				res := fmt.Sprintf("Project: %s | Profile: %s | Status: Running | Uptime: %s\n", projectName, profileName, time.Since(startTime).Round(time.Second))
 				conn.Write([]byte(res))
+			case "info":
+				res := fmt.Sprintf("domain=%s\n", domain)
+				conn.Write([]byte(res))
 			case "stop":
 				conn.Write([]byte(fmt.Sprintf("Stopping %s...\n", projectName)))
-				nodeCmd.Process.Kill()
+				if nodeCmd.Process != nil {
+					syscall.Kill(-nodeCmd.Process.Pid, syscall.SIGKILL)
+				}
 				os.Remove(socketPath)
 				os.Exit(0)
 			}

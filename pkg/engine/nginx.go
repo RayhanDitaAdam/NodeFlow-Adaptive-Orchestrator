@@ -97,3 +97,39 @@ func SetupSSL(domain string, email string) error {
 	fmt.Printf("SSL for %s is active. Your site is now served over HTTPS.\n", domain)
 	return nil
 }
+
+// DisableNginx removes the symlink from sites-enabled and reloads Nginx
+func DisableNginx(domain string) error {
+	if domain == "" {
+		return nil
+	}
+
+	fmt.Printf("\nDisabling Nginx for %s...\n", domain)
+
+	enabledPath := fmt.Sprintf("/etc/nginx/sites-enabled/%s", domain)
+	if _, err := os.Stat(enabledPath); os.IsNotExist(err) {
+		return nil
+	}
+
+	steps := []struct {
+		Name    string
+		Command []string
+	}{
+		{"Remove symlink", []string{"sudo", "rm", enabledPath}},
+		{"Validate syntax", []string{"sudo", "nginx", "-t"}},
+		{"Reload service", []string{"sudo", "systemctl", "reload", "nginx"}},
+	}
+
+	for i, step := range steps {
+		fmt.Printf("[%d/3] %s...\n", i+1, step.Name)
+		cmd := exec.Command(step.Command[0], step.Command[1:]...)
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			fmt.Printf("Error: %s\n", string(output))
+			return err
+		}
+	}
+
+	fmt.Printf("Nginx for %s disabled.\n", domain)
+	return nil
+}

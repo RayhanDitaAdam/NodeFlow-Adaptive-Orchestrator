@@ -77,6 +77,7 @@ func HandleStartCommand() {
 		Default: false,
 	}, &setupNginxPrompt)
 
+	domainOrIP := ""
 	if setupNginxPrompt {
 		exposureType := ""
 		survey.AskOne(&survey.Select{
@@ -84,7 +85,6 @@ func HandleStartCommand() {
 			Options: []string{"Public (Domain Name)", "Local (IP Address)"},
 		}, &exposureType)
 
-		domainOrIP := ""
 		port := detectedPort
 		
 		if exposureType == "Public (Domain Name)" {
@@ -117,7 +117,7 @@ func HandleStartCommand() {
 		}
 	}
 
-	launchDaemon(profiles[selectedProfile], entryPoint, startCmd, projectName)
+	launchDaemon(profiles[selectedProfile], entryPoint, startCmd, projectName, domainOrIP)
 }
 
 func getPublicIP() string {
@@ -146,7 +146,7 @@ func getLocalIP() string {
 	return "localhost"
 }
 
-func launchDaemon(config ServerProfile, entryPoint string, startCmd string, projectName string) {
+func launchDaemon(config ServerProfile, entryPoint string, startCmd string, projectName string, domain string) {
 	cmd := exec.Command(os.Args[0], "daemon-logic")
 	cmd.Env = append(os.Environ(),
 		fmt.Sprintf("GO_NODE_PROJECT_NAME=%s", projectName),
@@ -156,6 +156,7 @@ func launchDaemon(config ServerProfile, entryPoint string, startCmd string, proj
 		fmt.Sprintf("GO_NODE_ENV=%s", config.NodeEnv),
 		fmt.Sprintf("GO_NODE_ENTRY=%s", entryPoint),
 		fmt.Sprintf("GO_NODE_CMD=%s", startCmd),
+		fmt.Sprintf("GO_NODE_DOMAIN=%s", domain),
 	)
 	
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true} 
@@ -210,4 +211,34 @@ func SendCommandTo(projectName string, cmd string) {
 	for scanner.Scan() {
 		fmt.Println(scanner.Text())
 	}
+}
+
+// HandleStopCommand handles the full stop sequence including Nginx cleanup
+func HandleStopCommand(projectName string) {
+	socketPath := GetSocketPath(projectName)
+	conn, err := net.DialTimeout("unix", socketPath, 2*time.Second)
+	if err != nil {
+		fmt.Printf("Error: Service '%s' not found or not running.\n", projectName)
+		return
+	}
+	
+	// 1. Get info to check for domain
+	fmt.Fprintln(conn, "info")
+	scanner := bufio.NewScanner(conn)
+	domain := ""
+	if scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "domain=") {
+			domain = strings.TrimPrefix(line, "domain=")
+		}
+	}
+	conn.Close()
+
+	// 2. Disable Nginx if domain exists
+	if domain != "" {
+		DisableNginx(domain)
+	}
+
+	// 3. Send stop command
+	SendCommandTo(projectName, "stop")
 }

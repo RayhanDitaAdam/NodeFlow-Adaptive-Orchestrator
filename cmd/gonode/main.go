@@ -39,7 +39,7 @@ func main() {
 			fmt.Println("Usage: gonode stop <project-name>")
 			return
 		}
-		engine.SendCommandTo(os.Args[2], "stop")
+		engine.HandleStopCommand(os.Args[2])
 	case "help":
 		if len(os.Args) > 2 && os.Args[2] == "nginx" {
 			utils.PrintNginxHelp()
