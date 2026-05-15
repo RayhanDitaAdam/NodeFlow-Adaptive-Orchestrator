@@ -167,7 +167,10 @@ func HandleStartCommand() {
 				survey.AskOne(&survey.Input{Message: "Enter email for SSL notifications:", Default: "admin@" + domainOrIP}, &email)
 				if err := SetupSSL(domainOrIP, email); err != nil {
 					fmt.Println("\n❌ SSL Setup Failed! Your app will only be accessible over HTTP.")
-					fmt.Println("💡 Tip: Ensure Port 80/443 is open in your cloud firewall (Security Groups/UFW).")
+					fmt.Println("💡 Troubleshooting Tips:")
+					fmt.Println("  1. Run: 'sudo ufw allow 80/tcp && sudo ufw allow 443/tcp'")
+					fmt.Println("  2. If using AWS/GCP: Open Port 80 & 443 in your Security Groups (Inbound Rules).")
+					fmt.Println("  3. Ensure your domain is correctly pointing to this server's public IP.")
 					
 					continueAnyway := false
 					survey.AskOne(&survey.Confirm{
