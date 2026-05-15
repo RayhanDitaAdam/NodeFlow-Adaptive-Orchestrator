@@ -154,8 +154,8 @@ func HandleStartCommand() {
 	if setupNginxPrompt && domainOrIP != "" {
 		SetupNginx(domainOrIP, port)
 
-		// Check if it's a domain (contains dot) to offer SSL
-		if strings.Contains(domainOrIP, ".") {
+		// SSL only for Domains (not IP addresses)
+		if net.ParseIP(domainOrIP) == nil && strings.Contains(domainOrIP, ".") {
 			setupSSL := false
 			survey.AskOne(&survey.Confirm{
 				Message: "5. Setup SSL Certificate (Let's Encrypt)?",
