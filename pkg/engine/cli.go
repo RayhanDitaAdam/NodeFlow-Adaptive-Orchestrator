@@ -122,6 +122,11 @@ func HandleStartCommand() {
 		
 		if exposureType == "Public (Domain Name)" {
 			survey.AskOne(&survey.Input{Message: "Enter Domain:"}, &domainOrIP)
+			
+			if !VerifyDomainIP(domainOrIP) {
+				fmt.Println("Launch aborted due to DNS mismatch.")
+				return
+			}
 		} else {
 			fmt.Println("Fetching Server IP...")
 			domainOrIP = getPublicIP()
@@ -324,6 +329,48 @@ func CheckPortConflict(targetPort string) string {
 		conn.Close()
 	}
 	return ""
+}
+
+// VerifyDomainIP checks if the domain resolves to the current server's public IP
+func VerifyDomainIP(domain string) bool {
+	publicIP := getPublicIP()
+	
+	fmt.Printf("Verifying DNS for %s...\n", domain)
+	
+	ips, err := net.LookupIP(domain)
+	if err != nil {
+		fmt.Printf("⚠️  Could not resolve domain %s. Ensure it is configured correctly.\n", domain)
+		return false
+	}
+
+	match := false
+	var resolvedIP string
+	for _, ip := range ips {
+		if ip.To4() != nil {
+			resolvedIP = ip.String()
+			if resolvedIP == publicIP {
+				match = true
+				break
+			}
+		}
+	}
+
+	if !match {
+		fmt.Printf("\n⚠️  DNS MISMATCH DETECTED!\n")
+		fmt.Printf("  Domain: %s -> %s\n", domain, resolvedIP)
+		fmt.Printf("  Server Public IP: %s\n", publicIP)
+		fmt.Printf("\n💡 Please update your DNS records (DuckDNS/Cloudflare) to point to %s\n", publicIP)
+		
+		continueAnyway := false
+		survey.AskOne(&survey.Confirm{
+			Message: "Domain does not point to this server. Continue anyway?",
+			Default: false,
+		}, &continueAnyway)
+		return continueAnyway
+	}
+
+	fmt.Printf("✅ DNS verified. %s points to this server.\n", domain)
+	return true
 }
 
 // SendCommandTo sends a command to a specific project's daemon
