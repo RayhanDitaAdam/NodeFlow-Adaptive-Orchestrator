@@ -80,7 +80,7 @@ func HandleStartCommand() {
 	entryPoint := ""
 	startCmd := "node"
 	detectedPort := "3000"
-	
+
 	switch appType {
 	case "Smart Scan (AI Detect) [Recommended]":
 		fmt.Println("Analyzing project structure...")
@@ -119,10 +119,10 @@ func HandleStartCommand() {
 			Message: "Select Exposure Type:",
 			Options: []string{"Public (Domain Name)", "Local (IP Address)"},
 		}, &exposureType)
-		
+
 		if exposureType == "Public (Domain Name)" {
 			survey.AskOne(&survey.Input{Message: "Enter Domain:"}, &domainOrIP)
-			
+
 			if !VerifyDomainIP(domainOrIP) {
 				fmt.Println("Launch aborted due to DNS mismatch.")
 				return
@@ -132,7 +132,7 @@ func HandleStartCommand() {
 			domainOrIP = getPublicIP()
 			fmt.Printf("Access IP: %s\n", domainOrIP)
 		}
-		
+
 		survey.AskOne(&survey.Input{Message: "Enter App Port:", Default: detectedPort}, &port)
 	}
 
@@ -176,13 +176,13 @@ func HandleStartCommand() {
 					fmt.Println("  1. Run: 'sudo ufw allow 80/tcp && sudo ufw allow 443/tcp'")
 					fmt.Println("  2. If using AWS/GCP: Open Port 80 & 443 in your Security Groups (Inbound Rules).")
 					fmt.Println("  3. Ensure your domain is correctly pointing to this server's public IP.")
-					
+
 					continueAnyway := false
 					survey.AskOne(&survey.Confirm{
 						Message: "Do you want to continue launching over HTTP?",
 						Default: true,
 					}, &continueAnyway)
-					
+
 					if !continueAnyway {
 						fmt.Println("Launch aborted.")
 						return
@@ -243,8 +243,8 @@ func launchDaemon(config ServerProfile, entryPoint string, startCmd string, proj
 		fmt.Sprintf("GO_NODE_DOMAIN=%s", domain),
 		fmt.Sprintf("GO_NODE_PORT=%s", port),
 	)
-	
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true} 
+
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
 
 	if err := cmd.Start(); err != nil {
 		fmt.Printf("Failed to start daemon: %v\n", err)
@@ -334,9 +334,9 @@ func CheckPortConflict(targetPort string) string {
 // VerifyDomainIP checks if the domain resolves to the current server's public IP
 func VerifyDomainIP(domain string) bool {
 	publicIP := getPublicIP()
-	
+
 	fmt.Printf("Verifying DNS for %s...\n", domain)
-	
+
 	ips, err := net.LookupIP(domain)
 	if err != nil {
 		fmt.Printf("⚠️  Could not resolve domain %s. Ensure it is configured correctly.\n", domain)
@@ -359,8 +359,8 @@ func VerifyDomainIP(domain string) bool {
 		fmt.Printf("\n⚠️  DNS MISMATCH DETECTED!\n")
 		fmt.Printf("  Domain: %s -> %s\n", domain, resolvedIP)
 		fmt.Printf("  Server Public IP: %s\n", publicIP)
-		fmt.Printf("\n💡 Please update your DNS records (DuckDNS/Cloudflare) to point to %s\n", publicIP)
-		
+		fmt.Printf("\n💡 Please update your DNS records to point to %s\n", publicIP)
+
 		continueAnyway := false
 		survey.AskOne(&survey.Confirm{
 			Message: "Domain does not point to this server. Continue anyway?",
@@ -399,7 +399,7 @@ func HandleStopCommand(projectName string) {
 		fmt.Printf("Error: Service '%s' not found or not running.\n", projectName)
 		return
 	}
-	
+
 	// 1. Get info to check for domain
 	fmt.Fprintln(conn, "info")
 	scanner := bufio.NewScanner(conn)
