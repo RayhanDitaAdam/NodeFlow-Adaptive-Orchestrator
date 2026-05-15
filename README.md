@@ -63,7 +63,8 @@ GoNode/
 ├── docs/              # Guides & Requirements
 ├── examples/          # Example Node.js App
 ├── setup.sh           # Environment Setup (Go, Node, Nginx)
-└── install.sh         # Binary Builder & Global Setup
+├── install.sh         # Binary Builder & Global Setup
+└── README.md
 ```
 
 ---
@@ -98,3 +99,25 @@ gonode start
 ```bash
 gonode list
 ```
+
+---
+
+## Development Workflow
+
+To maintain code quality and stability, we follow a branching model:
+
+- **`main`**: Production-ready code. Only stable releases should be here.
+- **`development`**: Integration branch for new features and bug fixes.
+- **`feature/*`**: Temporary branches for developing specific features.
+
+### How to contribute:
+1. Fork the repository.
+2. Create a feature branch from `development` (`git checkout -b feature/amazing-feature`).
+3. Commit your changes.
+4. Open a Pull Request to `development`.
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
