@@ -59,6 +59,19 @@ func RunDaemonLogic() {
 	var nodeCmd *exec.Cmd
 	if strings.HasPrefix(startCmdStr, "npm") {
 		args := strings.Fields(startCmdStr)
+		if port != "" {
+			hasDashDash := false
+			for _, arg := range args {
+				if arg == "--" {
+					hasDashDash = true
+					break
+				}
+			}
+			if !hasDashDash {
+				args = append(args, "--")
+			}
+			args = append(args, "--port", port)
+		}
 		nodeCmd = exec.Command(args[0], args[1:]...)
 	} else {
 		nodeCmd = exec.Command("node", fmt.Sprintf("--max-old-space-size=%s", mem), entry)

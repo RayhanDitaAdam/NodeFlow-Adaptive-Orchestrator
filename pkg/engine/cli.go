@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -138,22 +139,68 @@ func HandleStartCommand() {
 
 	// ALWAYS check for port conflict if we have a port
 	if port != "" {
-		conflictingProject := CheckPortConflict(port)
-		if conflictingProject != "" {
-			fmt.Printf("⚠️  Port %s is already used by GoNode project '%s'.\n", port, conflictingProject)
-			stopConflicting := false
-			survey.AskOne(&survey.Confirm{
-				Message: fmt.Sprintf("Do you want to stop '%s' to free up the port?", conflictingProject),
-				Default: true,
-			}, &stopConflicting)
+		for {
+			conflictingProject := CheckPortConflict(port)
+			if conflictingProject != "" {
+				fmt.Printf("⚠️  Port %s is already used by GoNode project '%s'.\n", port, conflictingProject)
+				stopConflicting := false
+				survey.AskOne(&survey.Confirm{
+					Message: fmt.Sprintf("Do you want to stop '%s' to free up the port?", conflictingProject),
+					Default: true,
+				}, &stopConflicting)
 
-			if stopConflicting {
-				HandleStopCommand(conflictingProject)
-				time.Sleep(1 * time.Second)
-			} else {
-				fmt.Println("Launch cancelled. Port is busy.")
-				return
+				if stopConflicting {
+					HandleStopCommand(conflictingProject)
+					time.Sleep(1 * time.Second)
+					continue
+				} else {
+					startVal, err := strconv.Atoi(port)
+					if err != nil {
+						startVal = 3000
+					}
+					suggestedPort := FindFreePort(startVal)
+					fmt.Printf("Suggestion: Use a free port like %s\n", suggestedPort)
+					survey.AskOne(&survey.Input{Message: "Enter App Port:", Default: suggestedPort}, &port)
+					continue
+				}
 			}
+
+			// Check if the port is physically bound by any other process on the system
+			if IsPortInUse(port) {
+				fmt.Printf("⚠️  Port %s is already in use by another process on this server.\n", port)
+				
+				killIt := false
+				survey.AskOne(&survey.Confirm{
+					Message: fmt.Sprintf("Do you want to terminate the process occupying port %s?", port),
+					Default: false,
+				}, &killIt)
+
+				if killIt {
+					fmt.Printf("Terminating process using port %s...\n", port)
+					if err := KillProcessOnPort(port); err != nil {
+						fmt.Printf("❌ Failed to terminate process: %v\n", err)
+					} else {
+						time.Sleep(1 * time.Second) // Wait for port to clear
+						if !IsPortInUse(port) {
+							fmt.Printf("✅ Port %s successfully freed.\n", port)
+							continue
+						} else {
+							fmt.Printf("⚠️  Port %s is still in use.\n", port)
+						}
+					}
+				}
+
+				startVal, err := strconv.Atoi(port)
+				if err != nil {
+					startVal = 3000
+				}
+				suggestedPort := FindFreePort(startVal)
+				fmt.Printf("Suggestion: Use a free port like %s\n", suggestedPort)
+				survey.AskOne(&survey.Input{Message: "Enter App Port:", Default: suggestedPort}, &port)
+				continue
+			}
+
+			break
 		}
 	}
 	if setupNginxPrompt && domainOrIP != "" {
@@ -423,4 +470,51 @@ func HandleStopCommand(projectName string) {
 
 	// 3. Send stop command
 	SendCommandTo(projectName, "stop")
+}
+
+// IsPortInUse checks if a TCP port is in use on the host system
+func IsPortInUse(port string) bool {
+	ln, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		return true
+	}
+	ln.Close()
+	return false
+}
+
+// FindFreePort searches for a free TCP port starting from the given port
+func FindFreePort(startPort int) string {
+	for port := startPort; port < startPort+100; port++ {
+		pStr := strconv.Itoa(port)
+		if !IsPortInUse(pStr) {
+			return pStr
+		}
+	}
+	return ""
+}
+
+// KillProcessOnPort terminates any process currently listening on the specified TCP port
+func KillProcessOnPort(port string) error {
+	// 1. Try fuser -k
+	cmd := exec.Command("sudo", "fuser", "-k", port+"/tcp")
+	if err := cmd.Run(); err == nil {
+		return nil
+	}
+
+	// 2. Try lsof and kill
+	lsofCmd := exec.Command("sudo", "lsof", "-t", "-i:"+port)
+	pidBytes, err := lsofCmd.Output()
+	if err == nil {
+		pids := strings.TrimSpace(string(pidBytes))
+		if pids != "" {
+			for _, pidStr := range strings.Split(pids, "\n") {
+				pidStr = strings.TrimSpace(pidStr)
+				if pidStr != "" {
+					exec.Command("sudo", "kill", "-9", pidStr).Run()
+				}
+			}
+			return nil
+		}
+	}
+	return fmt.Errorf("could not kill process on port %s", port)
 }
