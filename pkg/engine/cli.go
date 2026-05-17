@@ -311,6 +311,11 @@ func launchDaemon(config ServerProfile, entryPoint string, startCmd string, proj
 	if success {
 		fmt.Printf("\nGoNode [%s] launched to background successfully.\n", projectName)
 		fmt.Printf("Logs: gonode logs %s\n", projectName)
+		if strings.Contains(startCmd, "dev") || strings.Contains(startCmd, "preview") {
+			fmt.Println("\n💡 Tip: If you see '$RefreshSig$ is not defined' or browser cache issues:")
+			fmt.Println("  1. Perform a Hard Reload (Ctrl + F5 or Cmd + Shift + R).")
+			fmt.Println("  2. Clear your browser cache for this IP/domain.")
+		}
 	} else {
 		fmt.Printf("\n❌ Error: GoNode [%s] failed to initialize. It might have crashed during startup.\n", projectName)
 		fmt.Printf("Check logs for details: cat %s.log\n", projectName)
