@@ -23,11 +23,11 @@ func SmartDetect() (string, string, string) {
 
 	// 1. Check for Vite
 	if strings.Contains(content, "vite") {
-		if _, ok := pkg.Scripts["preview"]; ok {
-			return "vite-project", "npm run preview", "4173"
-		}
 		if _, ok := pkg.Scripts["dev"]; ok {
-			return "vite-project (dev)", "npm run dev", "5173"
+			return "vite-project", "npm run dev", "5173"
+		}
+		if _, ok := pkg.Scripts["preview"]; ok {
+			return "vite-project (preview)", "npm run preview", "4173"
 		}
 	}
 
