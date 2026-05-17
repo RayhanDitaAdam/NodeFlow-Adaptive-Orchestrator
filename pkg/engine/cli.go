@@ -14,6 +14,8 @@ import (
 	"syscall"
 	"time"
 
+	"gonode/pkg/utils"
+
 	"github.com/AlecAivazis/survey/v2"
 )
 
@@ -309,8 +311,41 @@ func launchDaemon(config ServerProfile, entryPoint string, startCmd string, proj
 	}
 
 	if success {
-		fmt.Printf("\nGoNode [%s] launched to background successfully.\n", projectName)
-		fmt.Printf("Logs: gonode logs %s\n", projectName)
+		fmt.Printf("\nGoNode [%s] launched to background.\n", projectName)
+		if port != "" {
+			stop := make(chan bool)
+			utils.ShowLoading(stop, fmt.Sprintf("Waiting for application to bind to port %s (running build/install)...", port))
+			
+			portActive := false
+			// Wait up to 5 minutes (300 * 1s) for heavy builds like Next.js
+			for i := 0; i < 300; i++ {
+				time.Sleep(1 * time.Second)
+				if IsPortInUse(port) {
+					portActive = true
+					break
+				}
+				if _, err := os.Stat(GetSocketPath(projectName)); err != nil {
+					break
+				}
+			}
+			stop <- true
+			
+			if portActive {
+				fmt.Printf("\r🚀 GoNode [%s] is now LIVE and fully accessible!\n", projectName)
+				if domain != "" {
+					fmt.Printf("   Access URL: http://%s\n", domain)
+				} else {
+					fmt.Printf("   Access Port: %s\n", port)
+				}
+			} else {
+				fmt.Printf("\r⚠️  GoNode [%s] is taking longer than expected to start.\n", projectName)
+				fmt.Printf("   It is likely still running 'npm install' or 'npm run build' in the background.\n")
+				fmt.Printf("   You can monitor build progress at any time: gonode logs %s\n", projectName)
+			}
+		} else {
+			fmt.Printf("Logs: gonode logs %s\n", projectName)
+		}
+
 		if strings.Contains(startCmd, "dev") || strings.Contains(startCmd, "preview") {
 			fmt.Println("\n💡 Tip: If you see '$RefreshSig$ is not defined' or browser cache issues:")
 			fmt.Println("  1. Perform a Hard Reload (Ctrl + F5 or Cmd + Shift + R).")
